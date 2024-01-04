@@ -4,8 +4,11 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import useKeyboard from './helpers/useKeyboard'
+import { connectSocket } from './helpers/socketConnection'
 
 function App() {
+
+  const socket = useMemo(() => connectSocket(), [])
 
   const Plane = () => {
     return (
