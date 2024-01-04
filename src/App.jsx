@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import useKeyboard from './helpers/useKeyboard'
 
@@ -10,8 +10,8 @@ function App() {
   const Plane = () => {
     return (
       <mesh rotation={[Math.PI/2, 0, 0]}>
-        <planeGeometry args={[5, 5]} />
-        <meshBasicMaterial color="hotpink" side={THREE.DoubleSide} />
+        <planeGeometry args={[10, 10]} />
+        <meshBasicMaterial side={THREE.DoubleSide} />
       </mesh>
     )
   }
@@ -31,7 +31,7 @@ function App() {
 
     return (
       <>
-        <PerspectiveCamera ref={povRef} position={[0, 0.2, 2]} rotation={[0, 0, 0]} makeDefault  />
+        <PerspectiveCamera ref={povRef} position={[0, 0.2, 2]} rotation={[0, 0, 0]} makeDefault   />
         <PointerLockControls />
       </>
     )
@@ -43,7 +43,9 @@ function App() {
       <Canvas camera={{position: [0, 0.5, 0.3]}}>
         <Plane />
         <Pov />
+        <gridHelper />
         {/* <OrbitControls /> */}
+        <Stats />
       </Canvas>
     </div>
   )
