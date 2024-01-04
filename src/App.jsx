@@ -1,15 +1,15 @@
 /* eslint-disable react/no-unknown-property */
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import useKeyboard from './helpers/useKeyboard'
-import { connectSocket } from './helpers/socketConnection'
+import { connectSocket, sendModel } from './helpers/socketConnection'
 
 function App() {
 
-  const socket = useMemo(() => connectSocket(), [])
-
+  const socket = useMemo(() => connectSocket(), []);
+  
   const Plane = () => {
     return (
       <mesh rotation={[Math.PI/2, 0, 0]}>
@@ -18,7 +18,7 @@ function App() {
       </mesh>
     )
   }
-
+  
   const Pov = () => {
     const povRef = useRef()
     useHelper(povRef, THREE.CameraHelper)
@@ -30,7 +30,11 @@ function App() {
       keyMap['KeyW'] && (povRef.current.translateZ(-delta))
       keyMap['KeyS'] && (povRef.current.translateZ(delta))
       povRef.current.position.y = 0.2
+      if(keyMap['KeyA'] || keyMap['KeyD'] || keyMap['KeyW'] || keyMap['KeyS']) {
+        sendModel(socket, povRef.current.position)
+      }
     })
+
 
     return (
       <>
