@@ -9,6 +9,7 @@ import { connectSocket, sendModel } from './helpers/socketConnection'
 function App() {
 
   const socket = useMemo(() => connectSocket(), []);
+  sendModel(socket, {position: {x: 0, y: 0.2, z: 2}, rotation: {x: 0, y: 0, z: 0}})
   
   const Plane = () => {
     return (
@@ -24,6 +25,10 @@ function App() {
     useHelper(povRef, THREE.CameraHelper)
     const keyMap = useKeyboard()
 
+    const onChange = () => {
+      sendModel(socket, {position: povRef.current.position, rotation: povRef.current.rotation})
+    }
+
     useFrame((_, delta) => {
       keyMap['KeyA'] && (povRef.current.translateX(-delta))
       keyMap['KeyD'] && (povRef.current.translateX(delta))
@@ -31,7 +36,7 @@ function App() {
       keyMap['KeyS'] && (povRef.current.translateZ(delta))
       povRef.current.position.y = 0.2
       if(keyMap['KeyA'] || keyMap['KeyD'] || keyMap['KeyW'] || keyMap['KeyS']) {
-        sendModel(socket, povRef.current.position)
+        onChange()
       }
     })
 
@@ -39,7 +44,7 @@ function App() {
     return (
       <>
         <PerspectiveCamera ref={povRef} position={[0, 0.2, 2]} rotation={[0, 0, 0]} makeDefault   />
-        <PointerLockControls />
+        <PointerLockControls onChange={onChange} />
       </>
     )
   }
