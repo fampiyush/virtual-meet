@@ -5,7 +5,6 @@ export const connectSocket = () => {
     socket.on("connect", () => {
         console.log('connected')
     })
-    getAllModels(socket)
     receiveModel(socket)
     return socket
 }
@@ -22,6 +21,6 @@ export const receiveModel = (socket) => {
 
 export const getAllModels = (socket) => {
     socket.on('get-all-users', (models) => {
-        console.log(models)
+        return models
     })
 }
