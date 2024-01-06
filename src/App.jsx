@@ -1,16 +1,18 @@
 /* eslint-disable react/no-unknown-property */
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, useContext } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import useKeyboard from './helpers/useKeyboard'
 import { connectSocket, sendModel } from './helpers/socketConnection'
+import { PlayerContext } from './helpers/contextProvider'
 
 function App() {
 
   const [loading, setLoading] = useState(false)
   const [players, setPlayers] = useState(null)
-  const [playerKeys, setPlayerKeys] = useState(null)
+
+  const [playerKeys, setPlayerKeys] = useContext(PlayerContext)
 
   const socket = useMemo(() => connectSocket(), []);
   sendModel(socket, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}})
