@@ -1,11 +1,11 @@
 import React, { createContext, useState } from 'react';
 
 // Create a new context
-const PlayerContext = createContext("");
+const PlayerContext = createContext([]);
 
 // Create a provider component
 const ContextProvider = ({ children }) => {
-    const [playerKeys, setPlayerKeys] = useState(null)
+    const [playerKeys, setPlayerKeys] = useState([])
 
     return (
         <PlayerContext.Provider value={[ playerKeys, setPlayerKeys ]}>
