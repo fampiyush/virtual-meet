@@ -42,15 +42,21 @@ function App() {
     )
   }
   
+  const povRef = useRef()
+  useEffect(() => {
+    povRef.current = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    povRef.current.position.set(0, 0.2, 2)
+    povRef.current.rotation.set(0, 0, 0)
+  },[])
   const Pov = () => {
-    const povRef = useRef()
     useHelper(povRef, THREE.CameraHelper)
     const keyMap = useKeyboard()
 
+    
     const onChange = () => {
       sendModel(socket, {position: povRef.current.position, rotation: povRef.current.rotation})
     }
-
+    
     useFrame((_, delta) => {
       keyMap['KeyA'] && (povRef.current.translateX(-delta))
       keyMap['KeyD'] && (povRef.current.translateX(delta))
@@ -62,10 +68,9 @@ function App() {
       }
     })
 
-
     return (
       <>
-        <PerspectiveCamera ref={povRef} position={[0, 0.2, 2]} rotation={[0, 0, 0]} makeDefault   />
+        <PerspectiveCamera ref={povRef} position={povRef.current.position} rotation={povRef.current.rotation} makeDefault  />
         <PointerLockControls onChange={onChange} />
       </>
     )
