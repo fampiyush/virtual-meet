@@ -10,15 +10,27 @@ import { PlayerContext } from './helpers/contextProvider'
 function App() {
 
   const [loading, setLoading] = useState(false)
-  const [players, setPlayers] = useState(null)
+  // const [players, setPlayers] = useState(null)
 
   const [playerKeys, setPlayerKeys] = useContext(PlayerContext)
 
-  const socket = useMemo(() => connectSocket(), []);
-  sendModel(socket, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}})
+  const players = useRef(null)
+  const playersRef = useRef(null)
+
+  const getMap = () => {
+    if(!playersRef.current){
+      playersRef.current = new Map()
+    }
+    return playersRef.current
+  }
   
+  const socket = useMemo(() => connectSocket(), []);
   useEffect(() => {
+    sendModel(socket, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}})
     getPlayers()
+    updatePlayers()
+
+    return () => socket.off('get-all-users')
   }, [])
 
   const Plane = () => {
@@ -61,17 +73,46 @@ function App() {
 
   const getPlayers = () => {
     setLoading(true)
-    socket.on('get-all-users', (players) => {
-      setPlayers(players)
-      const keys = Object.keys(players)
+    socket.on('get-all-users', (player) => {
+      players.current = player
+      const keys = Object.keys(player)
       setPlayerKeys(keys)
     })
     setLoading(false)
   }
 
+  const updatePlayers = () => {
+    socket.on('user-model', (player) => {
+      const id = player.id
+      setPlayerKeys((prev) => {
+        if(!prev.includes(id)){
+          return [...prev, id]
+        }else {
+          return prev
+        }
+      })
+      players.current[id] = player.data
+      if(playersRef.current){
+        const currPlayer = playersRef.current.get(id)
+        if(currPlayer){
+          currPlayer.position.set(player.data.position.x, player.data.position.y, player.data.position.z)
+          currPlayer.rotation.set(player.data.rotation._x, player.data.rotation._y, player.data.rotation._z)
+        }
+      }
+    })
+  }
+
   const Player = (value) => {
     return (
-      <mesh position={[value.position.x, value.position.y, value.position.z]} rotation={[value.rotation._x, value.rotation._y, value.rotation._z]}>
+      <mesh ref={(e) => {
+        const map = getMap()
+          if(e){
+            map.set(value.refe, e)
+          }else {
+            map.delete(value.refe)
+          }
+        }
+        } position={[value.position.x, value.position.y, value.position.z]} rotation={[value.rotation._x, value.rotation._y, value.rotation._z]}>
         <boxGeometry args={[0.1, 0.1, 0.1]} />
         <meshBasicMaterial color='red' />
       </mesh>
@@ -90,7 +131,7 @@ function App() {
             playerKeys &&
             playerKeys.map((key, index) => {
               return (
-                <Player key={index} position={players[key].position} rotation={players[key].rotation} />
+                <Player refe={key} key={index} position={players.current[key].position} rotation={players.current[key].rotation} />
               )
             })
           }

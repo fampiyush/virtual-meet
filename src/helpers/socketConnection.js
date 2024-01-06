@@ -5,7 +5,6 @@ export const connectSocket = () => {
     socket.on("connect", () => {
         console.log('connected')
     })
-    receiveModel(socket)
     return socket
 }
 
