@@ -106,6 +106,19 @@ function App() {
         }
       }
     })
+    socket.on('user-disconnected', (player) => {
+      const id = player
+      setPlayerKeys((prev) => {
+        return prev.filter((key) => key !== id)
+      })
+      players.current[id] = null
+      if(playersRef.current){
+        const currPlayer = playersRef.current.get(id)
+        if(currPlayer){
+          playersRef.current.delete(id)
+        }
+      }
+    })
   }
 
   return (
