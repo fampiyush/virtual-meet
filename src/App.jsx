@@ -6,6 +6,7 @@ import * as THREE from 'three'
 import useKeyboard from './helpers/useKeyboard'
 import { connectSocket, sendModel } from './helpers/socketConnection'
 import { PlayerContext } from './helpers/contextProvider'
+import PlayerModel from './components/PlayerModel'
 
 function App() {
 
@@ -49,7 +50,7 @@ function App() {
     povRef.current.rotation.set(0, 0, 0)
   },[])
   const Pov = () => {
-    useHelper(povRef, THREE.CameraHelper)
+    // useHelper(povRef, THREE.CameraHelper)
     const keyMap = useKeyboard()
 
     
@@ -107,24 +108,6 @@ function App() {
     })
   }
 
-  const Player = (value) => {
-    return (
-      <mesh ref={(e) => {
-        const map = getMap()
-          if(e){
-            map.set(value.refe, e)
-          }else {
-            map.delete(value.refe)
-          }
-        }
-        } position={[value.position.x, value.position.y, value.position.z]} rotation={[value.rotation._x, value.rotation._y, value.rotation._z]}>
-        <boxGeometry args={[0.1, 0.1, 0.1]} />
-        <meshBasicMaterial color='red' />
-      </mesh>
-    )
-  }
-
-
   return (
     <div className='h-screen w-screen'>
       {
@@ -136,7 +119,7 @@ function App() {
             playerKeys &&
             playerKeys.map((key, index) => {
               return (
-                <Player refe={key} key={index} position={players.current[key].position} rotation={players.current[key].rotation} />
+                <PlayerModel refe={key} key={index} position={players.current[key].position} rotation={players.current[key].rotation} getMap={getMap} />
               )
             })
           }
