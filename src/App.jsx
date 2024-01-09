@@ -4,19 +4,22 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import useKeyboard from './helpers/useKeyboard'
+import { Peer } from "peerjs"
 import { connectSocket, sendModel } from './helpers/socketConnection'
 import { PlayerContext } from './helpers/contextProvider'
 import PlayerModel from './components/PlayerModel'
 
 function App() {
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   // const [players, setPlayers] = useState(null)
 
   const [playerKeys, setPlayerKeys] = useContext(PlayerContext)
 
   const players = useRef(null)
   const playersRef = useRef(null)
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
 
   const getMap = () => {
     if(!playersRef.current){
@@ -26,11 +29,12 @@ function App() {
   }
   
   const socket = useMemo(() => connectSocket(), []);
+  const peer = useMemo(() => new Peer(socket.id), [socket]);
   useEffect(() => {
     sendModel(socket, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}})
     getPlayers()
     updatePlayers()
-
+    getMedia()
     return () => socket.off('get-all-users')
   }, [])
 
@@ -71,10 +75,40 @@ function App() {
 
     return (
       <>
-        <PerspectiveCamera ref={povRef} position={povRef.current.position} rotation={povRef.current.rotation} makeDefault  />
+        <PerspectiveCamera ref={povRef} position={povRef.current.position} rotation={povRef.current.rotation} makeDefault />
         <PointerLockControls onChange={onChange} />
       </>
     )
+  }
+
+  const getMedia = () => {
+    navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    }).then(stream => {
+      streamRef.current = stream
+      addVideoStream(socket.id, stream, true)
+      peer.on('call', call => {
+        console.log('first')
+        call.answer(stream)
+        call.on('stream', userVideoStream => {
+          addVideoStream(userVideoStream.id, userVideoStream, false)
+        })
+      })
+    })
+  }
+  
+  const addVideoStream = (id, stream, me) => {
+    const video = document.createElement('video')
+    video.srcObject = stream
+    video.addEventListener('loadedmetadata', () => {
+      video.play()
+    })
+    if(me){
+      video.muted = true
+    }
+      document.getElementById('videos').append(video)
+      videoRef.current = {...videoRef.current, [id]: video}
   }
 
   const getPlayers = () => {
@@ -92,6 +126,7 @@ function App() {
       const id = player.id
       setPlayerKeys((prev) => {
         if(!prev.includes(id)){
+          connectToNewUser(id)
           return [...prev, id]
         }else {
           return prev
@@ -121,8 +156,20 @@ function App() {
     })
   }
 
+  const connectToNewUser = (id) => {
+    const call = peer.call(id, streamRef.current)
+    call.on('stream', userVideoStream => {
+        addVideoStream(userVideoStream.id, userVideoStream, false)
+    })
+  }
+
   return (
     <div className='h-screen w-screen'>
+      <div className='fixed top-0 right-0'>
+        <div id='videos' className='w-24 h-24'>
+
+        </div>
+      </div>
       {
         !loading ?
         <Canvas camera={{position: [0, 0.5, 0.3]}}>
