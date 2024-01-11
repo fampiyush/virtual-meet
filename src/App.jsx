@@ -4,7 +4,6 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import useKeyboard from './helpers/useKeyboard'
-import { Peer } from "peerjs"
 import { connectSocket, sendModel } from './helpers/socketConnection'
 import { PlayerContext } from './helpers/contextProvider'
 import PlayerModel from './components/PlayerModel'
@@ -15,9 +14,11 @@ function App() {
   // const [players, setPlayers] = useState(null)
 
   const [playerKeys, setPlayerKeys] = useContext(PlayerContext)
+  const [videosComponent, setVideosComponent] = useState([])
 
   const players = useRef(null)
   const playersRef = useRef(null)
+  const videos = useRef(null)
   const videoRef = useRef(null)
   const streamRef = useRef(null)
 
@@ -27,15 +28,27 @@ function App() {
     }
     return playersRef.current
   }
+
+  const getVideo = () => {
+    if(!videoRef.current){
+      videoRef.current = new Map()
+    }
+    return videoRef.current
+  }
   
-  const socket = useMemo(() => connectSocket(), []);
-  const peer = useMemo(() => new Peer(socket.id), [socket]);
+  let peer = useRef(null)
+  let socket = useRef(null)
   useEffect(() => {
-    sendModel(socket, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}})
-    getPlayers()
-    updatePlayers()
-    getMedia()
-    return () => socket.off('get-all-users')
+    connectSocket().then((value) => {
+      socket.current = value.socket
+      peer.current = value.peer
+
+      getPlayers()
+      updatePlayers()
+      getMedia()
+      setLoading(false)
+    })
+    return () => socket.current.off('get-all-users')
   }, [])
 
   const Plane = () => {
@@ -57,9 +70,8 @@ function App() {
     // useHelper(povRef, THREE.CameraHelper)
     const keyMap = useKeyboard()
 
-    
     const onChange = () => {
-      sendModel(socket, {position: povRef.current.position, rotation: povRef.current.rotation})
+      sendModel(socket.current, {position: povRef.current.position, rotation: povRef.current.rotation, peerId: peer.current.id})
     }
     
     useFrame((_, delta) => {
@@ -87,52 +99,74 @@ function App() {
       audio: true
     }).then(stream => {
       streamRef.current = stream
-      addVideoStream(socket.id, stream, true)
-      peer.on('call', call => {
-        console.log('first')
+      peer.current.on('call', call => {
+        console.log('received')
         call.answer(stream)
         call.on('stream', userVideoStream => {
-          addVideoStream(userVideoStream.id, userVideoStream, false)
+          videos.current = {...videos.current, [call.peer]: userVideoStream}
+          setVideosComponent((prev) => {
+            if(!prev.includes(call.peer)){
+              return [...prev, call.peer]
+            }else {
+              return prev
+            }
+          })
         })
+      })
+      peer.current.on('open', () => {
+        sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id})
+        videos.current = {[peer.current.id]: stream}
+        setVideosComponent([peer.current.id])
       })
     })
   }
+
+  useEffect(() => {
+    if(videosComponent.length > 0){
+      const lastItem = videosComponent[videosComponent.length - 1];
+      if(lastItem === peer.current.id){
+        addVideoStream(lastItem, videos.current[lastItem], true)
+      }else {
+        addVideoStream(lastItem, videos.current[lastItem], false)
+      }
+    }
+  },[videosComponent])
   
   const addVideoStream = (id, stream, me) => {
-    const video = document.createElement('video')
-    video.srcObject = stream
-    video.addEventListener('loadedmetadata', () => {
+    const video = videoRef.current.get(id)
+    if(video){
+      if(me){
+        video.muted = true
+      }else {
+        console.log('not me')
+      }
+      video.srcObject = stream
       video.play()
-    })
-    if(me){
-      video.muted = true
+      video.className = 'w-24'
     }
-      document.getElementById('videos').append(video)
-      videoRef.current = {...videoRef.current, [id]: video}
   }
 
   const getPlayers = () => {
-    setLoading(true)
-    socket.on('get-all-users', (player) => {
+    socket.current.emit('get-all-users')
+    socket.current.on('all-users', (player) => {
       players.current = player
       const keys = Object.keys(player)
       setPlayerKeys(keys)
     })
-    setLoading(false)
   }
 
   const updatePlayers = () => {
-    socket.on('user-model', (player) => {
+    socket.current.on('user-model', (player) => {
       const id = player.id
       setPlayerKeys((prev) => {
         if(!prev.includes(id)){
-          connectToNewUser(id)
+          connectToNewUser(player.data.peerId)
           return [...prev, id]
         }else {
           return prev
         }
       })
-      players.current[id] = player.data
+      players.current = {...players.current, [id]: player.data}
       if(playersRef.current){
         const currPlayer = playersRef.current.get(id)
         if(currPlayer){
@@ -141,7 +175,7 @@ function App() {
         }
       }
     })
-    socket.on('user-disconnected', (player) => {
+    socket.current.on('user-disconnected', (player) => {
       const id = player
       setPlayerKeys((prev) => {
         return prev.filter((key) => key !== id)
@@ -157,18 +191,38 @@ function App() {
   }
 
   const connectToNewUser = (id) => {
-    const call = peer.call(id, streamRef.current)
+    const call = peer.current.call(id, streamRef.current)
+    console.log('calling', id)
     call.on('stream', userVideoStream => {
-        addVideoStream(userVideoStream.id, userVideoStream, false)
+      videos.current = {...videos.current, [id]: userVideoStream}
+      setVideosComponent((prev) => {
+        if(!prev.includes(id)){
+          return [...prev, id]
+        }else {
+          return prev
+        }
+      })
     })
   }
 
   return (
     <div className='h-screen w-screen'>
-      <div className='fixed top-0 right-0'>
-        <div id='videos' className='w-24 h-24'>
-
-        </div>
+      <div id='videos' className='fixed top-0 right-0 flex'>
+        {
+          videosComponent &&
+          videosComponent.map((video, index) => {
+            return (
+              <video ref={(e) => {
+                const map = getVideo()
+                if(e){
+                  map.set(video, e)
+                }else {
+                  map.delete(video)
+                }
+              }} key={index} />
+            )
+          })
+        }
       </div>
       {
         !loading ?

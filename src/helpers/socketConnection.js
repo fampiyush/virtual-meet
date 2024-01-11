@@ -1,11 +1,17 @@
 import { io } from "socket.io-client";
+import { Peer } from "peerjs"
 
 export const connectSocket = () => {
     const socket = io("http://localhost:3000");
-    socket.on("connect", () => {
-        console.log('connected')
-    })
-    return socket
+    const peer = new Peer();
+
+    const promise = new Promise((resolve) => {
+        socket.on("connect", () => {
+            resolve({ socket, peer });
+        });
+    });
+
+    return promise;
 }
 
 export const sendModel = (socket, model) => {
