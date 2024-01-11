@@ -178,7 +178,7 @@ function App() {
       }
     })
     socket.current.on('user-disconnected', (player) => {
-      const id = player
+      const id = player.id
       setPlayerKeys((prev) => {
         return prev.filter((key) => key !== id)
       })
@@ -187,6 +187,17 @@ function App() {
         const currPlayer = playersRef.current.get(id)
         if(currPlayer){
           playersRef.current.delete(id)
+        }
+      }
+      const peerId = player.peerId
+      setVideosComponent((prev) => {
+        return prev.filter((key) => key !== peerId)
+      })
+      videos.current[peerId] = null
+      if(videoRef.current){
+        const currVideo = videoRef.current.get(peerId)
+        if(currVideo){
+          videoRef.current.delete(peerId)
         }
       }
     })
