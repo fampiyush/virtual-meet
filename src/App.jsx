@@ -39,14 +39,20 @@ function App() {
   let peer = useRef(null)
   let socket = useRef(null)
   useEffect(() => {
-    connectSocket().then((value) => {
-      socket.current = value.socket
-      peer.current = value.peer
+    var getUserMedia = navigator.mediaDevices.getUserMedia
+    getUserMedia({
+      video: true,
+      audio: true
+    }).then(stream => {
+      connectSocket().then((value) => {
+        socket.current = value.socket
+        peer.current = value.peer
 
-      getPlayers()
-      updatePlayers()
-      getMedia()
-      setLoading(false)
+        getPlayers()
+        updatePlayers()
+        getMedia(stream)
+        setLoading(false)
+      })
     })
     return () => socket.current.off('get-all-users')
   }, [])
@@ -93,17 +99,15 @@ function App() {
     )
   }
 
-  const getMedia = () => {
-    navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true
-    }).then(stream => {
+  const getMedia = (stream) => {
       streamRef.current = stream
       peer.current.on('call', call => {
-        console.log('received')
         call.answer(stream)
         call.on('stream', userVideoStream => {
+          console.log('receiving from', call.peer)
+          if(!videos.current[call.peer]){
           videos.current = {...videos.current, [call.peer]: userVideoStream}
+          }
           setVideosComponent((prev) => {
             if(!prev.includes(call.peer)){
               return [...prev, call.peer]
@@ -114,11 +118,11 @@ function App() {
         })
       })
       peer.current.on('open', () => {
+        console.log('Me', peer.current.id)
         sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id})
         videos.current = {[peer.current.id]: stream}
         setVideosComponent([peer.current.id])
       })
-    })
   }
 
   useEffect(() => {
@@ -134,15 +138,13 @@ function App() {
   
   const addVideoStream = (id, stream, me) => {
     const video = videoRef.current.get(id)
+      video.srcObject = stream
     if(video){
       if(me){
         video.muted = true
-      }else {
-        console.log('not me')
       }
-      video.srcObject = stream
-      video.play()
       video.className = 'w-24'
+      video.play()
     }
   }
 
@@ -194,7 +196,9 @@ function App() {
     const call = peer.current.call(id, streamRef.current)
     console.log('calling', id)
     call.on('stream', userVideoStream => {
+      if(!videos.current[id]){
       videos.current = {...videos.current, [id]: userVideoStream}
+      }
       setVideosComponent((prev) => {
         if(!prev.includes(id)){
           return [...prev, id]
@@ -219,7 +223,7 @@ function App() {
                 }else {
                   map.delete(video)
                 }
-              }} key={index} />
+              }} key={index} autoPlay />
             )
           })
         }
