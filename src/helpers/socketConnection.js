@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 import { Peer } from "peerjs"
 
 export const connectSocket = () => {
-    const socket = io("http://localhost:3000");
+    const socket = io("https://virtual-backend-test.onrender.com/");
     const peer = new Peer();
 
     const promise = new Promise((resolve) => {
