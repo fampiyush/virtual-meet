@@ -1,12 +1,12 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useRef, useState, useMemo, useContext } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useHelper, PointerLockControls, Stats } from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, useHelper, Stats } from '@react-three/drei'
 import * as THREE from 'three'
-import useKeyboard from './helpers/useKeyboard'
 import { connectSocket, sendModel } from './helpers/socketConnection'
 import { PlayerContext } from './helpers/contextProvider'
 import PlayerModel from './components/PlayerModel'
+import Pov from './components/Pov'
 
 function App() {
 
@@ -15,10 +15,11 @@ function App() {
 
   const [playerKeys, setPlayerKeys] = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
+  const [videos, setVideos] = useState({})
 
   const players = useRef(null)
   const playersRef = useRef(null)
-  const videos = useRef(null)
+  // const videos = useRef(null)
   const videoRef = useRef(null)
   const streamRef = useRef(null)
 
@@ -65,39 +66,6 @@ function App() {
       </mesh>
     )
   }
-  
-  const povRef = useRef()
-  useEffect(() => {
-    povRef.current = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    povRef.current.position.set(0, 0.2, 2)
-    povRef.current.rotation.set(0, 0, 0)
-  },[])
-  const Pov = () => {
-    // useHelper(povRef, THREE.CameraHelper)
-    const keyMap = useKeyboard()
-
-    const onChange = () => {
-      sendModel(socket.current, {position: povRef.current.position, rotation: povRef.current.rotation, peerId: peer.current.id})
-    }
-    
-    useFrame((_, delta) => {
-      keyMap['KeyA'] && (povRef.current.translateX(-delta))
-      keyMap['KeyD'] && (povRef.current.translateX(delta))
-      keyMap['KeyW'] && (povRef.current.translateZ(-delta))
-      keyMap['KeyS'] && (povRef.current.translateZ(delta))
-      povRef.current.position.y = 0.2
-      if(keyMap['KeyA'] || keyMap['KeyD'] || keyMap['KeyW'] || keyMap['KeyS']) {
-        onChange()
-      }
-    })
-
-    return (
-      <>
-        <PerspectiveCamera ref={povRef} position={povRef.current.position} rotation={povRef.current.rotation} makeDefault />
-        <PointerLockControls onChange={onChange} />
-      </>
-    )
-  }
 
   const getMedia = (stream) => {
       streamRef.current = stream
@@ -105,8 +73,11 @@ function App() {
         call.answer(stream)
         call.on('stream', userVideoStream => {
           console.log('receiving from', call.peer)
-          if(!videos.current[call.peer]){
-          videos.current = {...videos.current, [call.peer]: userVideoStream}
+          if(!videos[call.peer]){
+          setVideos((prev) => {
+            console.log(prev)
+            return {...prev, [call.peer]: userVideoStream}
+          })
           }
           setVideosComponent((prev) => {
             if(!prev.includes(call.peer)){
@@ -120,7 +91,7 @@ function App() {
       peer.current.on('open', () => {
         console.log('Me', peer.current.id)
         sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id})
-        videos.current = {[peer.current.id]: stream}
+        setVideos({[peer.current.id]: stream})
         setVideosComponent([peer.current.id])
       })
   }
@@ -129,9 +100,9 @@ function App() {
     if(videosComponent.length > 0){
       const lastItem = videosComponent[videosComponent.length - 1];
       if(lastItem === peer.current.id){
-        addVideoStream(lastItem, videos.current[lastItem], true)
+        addVideoStream(lastItem, videos[lastItem], true)
       }else {
-        addVideoStream(lastItem, videos.current[lastItem], false)
+        addVideoStream(lastItem, videos[lastItem], false)
       }
     }
   },[videosComponent])
@@ -152,7 +123,7 @@ function App() {
     socket.current.emit('get-all-users')
     socket.current.on('all-users', (player) => {
       players.current = player
-      const keys = Object.keys(player)
+      const keys = Object.entries(player).map(([key, value]) => ({ socketId: key, peerId: value.peerId }))
       setPlayerKeys(keys)
     })
   }
@@ -161,9 +132,10 @@ function App() {
     socket.current.on('user-model', (player) => {
       const id = player.id
       setPlayerKeys((prev) => {
-        if(!prev.includes(id)){
+        const socketIds = prev.map((key) => key.socketId)
+        if(!socketIds.includes(id)){
           connectToNewUser(player.data.peerId)
-          return [...prev, id]
+          return [...prev, {socketId: id, peerId: player.data.peerId}]
         }else {
           return prev
         }
@@ -178,9 +150,9 @@ function App() {
       }
     })
     socket.current.on('user-disconnected', (player) => {
-      const id = player.id
+      const id = player.socketId
       setPlayerKeys((prev) => {
-        return prev.filter((key) => key !== id)
+        return prev.filter((key) => key.socketId !== id)
       })
       players.current[id] = null
       if(playersRef.current){
@@ -193,7 +165,7 @@ function App() {
       setVideosComponent((prev) => {
         return prev.filter((key) => key !== peerId)
       })
-      videos.current[peerId] = null
+      videos[peerId] = null
       if(videoRef.current){
         const currVideo = videoRef.current.get(peerId)
         if(currVideo){
@@ -207,8 +179,11 @@ function App() {
     const call = peer.current.call(id, streamRef.current)
     console.log('calling', id)
     call.on('stream', userVideoStream => {
-      if(!videos.current[id]){
-      videos.current = {...videos.current, [id]: userVideoStream}
+      if(!videos[id]){
+      setVideos((prev) => {
+        console.log(prev)
+        return {...prev, [id]: userVideoStream}
+      })
       }
       setVideosComponent((prev) => {
         if(!prev.includes(id)){
@@ -222,7 +197,7 @@ function App() {
 
   return (
     <div className='h-screen w-screen'>
-      <div id='videos' className='fixed top-0 right-0 flex'>
+      <div id='videos' className='fixed top-0 right-0 hidden'>
         {
           videosComponent &&
           videosComponent.map((video, index) => {
@@ -243,12 +218,15 @@ function App() {
         !loading ?
         <Canvas camera={{position: [0, 0.5, 0.3]}}>
           <Plane />
-          <Pov />
+          {
+            (socket.current && peer.current) &&
+            <Pov socket={socket} peer={peer} />
+          }
           {
             playerKeys &&
             playerKeys.map((key, index) => {
               return (
-                <PlayerModel refe={key} key={index} position={players.current[key].position} rotation={players.current[key].rotation} getMap={getMap} />
+                <PlayerModel refe={key.socketId} key={index} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} />
               )
             })
           }
