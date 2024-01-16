@@ -224,7 +224,7 @@ function App() {
             playerKeys &&
             playerKeys.map((key, index) => {
               return (
-                <PlayerModel refe={key.socketId} key={index} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} />
+                <PlayerModel refe={key.socketId} key={key.socketId} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} />
               )
             })
           }
