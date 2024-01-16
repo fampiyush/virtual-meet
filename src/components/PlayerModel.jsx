@@ -5,6 +5,7 @@ import { useVideoTexture } from '@react-three/drei'
 
 const PlayerModel = (value) => {
 
+  // console.log('rendering player model ', value.refe)
   const VideoMaterial = ({src, attach}) => {
     const texture = useVideoTexture(src)
 
@@ -21,7 +22,7 @@ const PlayerModel = (value) => {
             }
         }
         } position={[value.position.x, value.position.y, value.position.z]} rotation={[value.rotation._x, value.rotation._y, value.rotation._z]}>
-        <boxGeometry args={[0.1, 0.1, 0.1]} />
+        <boxGeometry args={[0.3, 0.2, 0]} />
         <meshBasicMaterial color='red' attach="material-0" />
         <meshBasicMaterial color='red' attach="material-1" />
         <meshBasicMaterial color='red' attach="material-2" />

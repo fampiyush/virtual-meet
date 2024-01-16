@@ -75,7 +75,6 @@ function App() {
           console.log('receiving from', call.peer)
           if(!videos[call.peer]){
           setVideos((prev) => {
-            console.log(prev)
             return {...prev, [call.peer]: userVideoStream}
           })
           }
@@ -181,7 +180,6 @@ function App() {
     call.on('stream', userVideoStream => {
       if(!videos[id]){
       setVideos((prev) => {
-        console.log(prev)
         return {...prev, [id]: userVideoStream}
       })
       }
