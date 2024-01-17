@@ -51,8 +51,6 @@ function App() {
         audio: true
       }).then(stream => {
         console.log(room.current)
-          getPlayers()
-          updatePlayers()
           getMedia(stream)
           setLoading(false)
       })
@@ -100,6 +98,8 @@ function App() {
       peer.current.on('open', () => {
         console.log('Me', peer.current.id)
         sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id, room:room.current})
+        getPlayers()
+        updatePlayers()
         setVideos({[peer.current.id]: stream})
         setVideosComponent([peer.current.id])
       })
@@ -131,7 +131,6 @@ function App() {
   const getPlayers = () => {
     socket.current.emit('get-all-users')
     socket.current.on('all-users', (player) => {
-      console.log(player)
       players.current = player
       const keys = Object.entries(player).map(([key, value]) => ({ socketId: key, peerId: value.peerId }))
       setPlayerKeys(keys)
