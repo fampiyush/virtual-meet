@@ -1,13 +1,21 @@
 import { io } from "socket.io-client";
 import { Peer } from "peerjs"
 
-export const connectSocket = () => {
-    const socket = io("https://virtual-backend-test.onrender.com/");
+export const connectSocket = (room) => {
+    // const socket = io("https://virtual-backend-test.onrender.com/");
+    const socket = io("http://localhost:3000/");
     const peer = new Peer();
 
     const promise = new Promise((resolve) => {
         socket.on("connect", () => {
-            resolve({ socket, peer });
+            socket.emit('join', room)
+            socket.on('joined-room', (room) => {
+                if(room){
+                    resolve({ socket, peer, room });
+                }else {
+                    resolve(room)
+                }
+            })
         });
     });
 
