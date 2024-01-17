@@ -2,7 +2,6 @@ import { io } from "socket.io-client";
 import { Peer } from "peerjs"
 
 export const connectSocket = (room) => {
-    console.log(import.meta.env.VITE_BACKEND_URL)
     const socket = io(import.meta.env.VITE_BACKEND_URL);
     const peer = new Peer();
 
