@@ -131,6 +131,7 @@ function App() {
   const getPlayers = () => {
     socket.current.emit('get-all-users')
     socket.current.on('all-users', (player) => {
+      console.log(player)
       players.current = player
       const keys = Object.entries(player).map(([key, value]) => ({ socketId: key, peerId: value.peerId }))
       setPlayerKeys(keys)
