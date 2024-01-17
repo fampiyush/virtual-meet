@@ -21,7 +21,7 @@ const PlayerModel = (value) => {
             map.delete(value.refe)
             }
         }
-        } position={[value.position.x, value.position.y, value.position.z]} rotation={[value.rotation._x, value.rotation._y, value.rotation._z]} key={value.key}>
+        } position={[value.position.x, value.position.y, value.position.z]} rotation={[value.rotation._x, value.rotation._y, value.rotation._z]}>
         <boxGeometry args={[0.3, 0.2, 0]} />
         <meshBasicMaterial color='red' attach="material-0" />
         <meshBasicMaterial color='red' attach="material-1" />
