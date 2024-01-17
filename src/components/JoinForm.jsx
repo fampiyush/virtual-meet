@@ -26,6 +26,7 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
     const onNewMeet = () => {
         // Handle new meeting logic here
         connectSocket().then((value) => {
+            console.log(value)
             socket.current = value.socket
             peer.current = value.peer
             room.current = value.room
