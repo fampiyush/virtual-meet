@@ -5,13 +5,13 @@ import { useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, PointerLockControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-const Pov = ({socket, peer}) => {
+const Pov = ({socket, peer, room}) => {
     const povRef = useRef(null)
     povRef.current = useMemo(() => new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000), []) 
     const keyMap = useKeyboard()
 
     const onChange = () => {
-      sendModel(socket.current, {position: povRef.current.position, rotation: povRef.current.rotation, peerId: peer.current.id})
+      sendModel(socket.current, {position: povRef.current.position, rotation: povRef.current.rotation, peerId: peer.current.id, room:room.current})
     }
     
     useFrame((_, delta) => {

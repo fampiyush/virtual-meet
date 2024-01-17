@@ -7,6 +7,7 @@ import { connectSocket, sendModel } from './helpers/socketConnection'
 import { PlayerContext } from './helpers/contextProvider'
 import PlayerModel from './components/PlayerModel'
 import Pov from './components/Pov'
+import JoinForm from './components/JoinForm'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [errMessage, setErrMessage] = useState(null)
+  const [formDone, setFormDone] = useState(false)
 
   const players = useRef(null)
   const playersRef = useRef(null)
@@ -40,33 +42,31 @@ function App() {
   
   let peer = useRef(null)
   let socket = useRef(null)
+  let room = useRef(null)
   useEffect(() => {
-    var getUserMedia = navigator.mediaDevices.getUserMedia
-    getUserMedia({
-      video: true,
-      audio: true
-    }).then(stream => {
-      connectSocket().then((value) => {
-        socket.current = value.socket
-        peer.current = value.peer
-
-        getPlayers()
-        updatePlayers()
-        getMedia(stream)
-        setLoading(false)
+    if(formDone){
+      var getUserMedia = navigator.mediaDevices.getUserMedia
+      getUserMedia({
+        video: true,
+        audio: true
+      }).then(stream => {
+        console.log(room.current)
+          getPlayers()
+          updatePlayers()
+          getMedia(stream)
+          setLoading(false)
       })
-    })
-    .catch(err => {
-      console.log(err.message)
-      if(err.message === 'Permission denied'){
-        setErrMessage('Please allow camera and microphone access to use this app')
-      }
-      if(err.message === 'Device in use'){
-        setErrMessage('Camera or microphone is already in use, please close all other apps using the camera and microphone')
-      }
-    })
-    return () => socket.current.off('get-all-users')
-  }, [])
+      .catch(err => {
+        console.log(err.message)
+        if(err.message === 'Permission denied'){
+          setErrMessage('Please allow camera and microphone access to use this app')
+        }
+        if(err.message === 'Device in use'){
+          setErrMessage('Camera or microphone is already in use, please close all other apps using the camera and microphone')
+        }
+      })
+    }
+  }, [formDone])
 
   const Plane = () => {
     return (
@@ -99,7 +99,7 @@ function App() {
       })
       peer.current.on('open', () => {
         console.log('Me', peer.current.id)
-        sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id})
+        sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id, room:room.current})
         setVideos({[peer.current.id]: stream})
         setVideosComponent([peer.current.id])
       })
@@ -206,50 +206,57 @@ function App() {
   return (
     <div className='h-screen w-screen'>
     {
-      errMessage ?
-      <h1 className='text-center text-2xl'>{errMessage}</h1>
+      !formDone ?
+      <JoinForm setFormDone={setFormDone} peer={peer} socket={socket} room={room} />
       :
       <>
-
-      <div id='videos' className='fixed top-0 right-0 hidden'>
-        {
-          videosComponent &&
-          videosComponent.map((video, index) => {
-            return (
-              <video ref={(e) => {
-                const map = getVideo()
-                if(e){
-                  map.set(video, e)
-                }else {
-                  map.delete(video)
-                }
-              }} key={index} autoPlay />
-            )
-          })
-        }
-      </div>
       {
-        !loading ?
-        <Canvas camera={{position: [0, 0.5, 0.3]}}>
-          <Plane />
+        errMessage ?
+        <h1 className='text-center text-2xl'>{errMessage}</h1>
+        :
+        <>
+
+        <div id='videos' className='fixed top-0 right-0 hidden'>
           {
-            (socket.current && peer.current) &&
-            <Pov socket={socket} peer={peer} />
-          }
-          {
-            playerKeys &&
-            playerKeys.map((key, index) => {
+            videosComponent &&
+            videosComponent.map((video, index) => {
               return (
-                <PlayerModel refe={key.socketId} key={key.socketId} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} />
+                <video ref={(e) => {
+                  const map = getVideo()
+                  if(e){
+                    map.set(video, e)
+                  }else {
+                    map.delete(video)
+                  }
+                }} key={index} autoPlay />
               )
             })
           }
-          <gridHelper />
-          {/* <OrbitControls /> */}
-          <Stats />
-        </Canvas>
-        :
-        <h1>Loading...</h1>
+        </div>
+        {
+          !loading ?
+          <Canvas camera={{position: [0, 0.5, 0.3]}}>
+            <Plane />
+            {
+              (socket.current && peer.current) &&
+              <Pov socket={socket} peer={peer} room={room} />
+            }
+            {
+              playerKeys &&
+              playerKeys.map((key, index) => {
+                return (
+                  <PlayerModel refe={key.socketId} key={key.socketId} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} />
+                )
+              })
+            }
+            <gridHelper />
+            {/* <OrbitControls /> */}
+            <Stats />
+          </Canvas>
+          :
+          <h1>Loading...</h1>
+        }
+        </>
       }
       </>
     }
