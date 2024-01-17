@@ -16,6 +16,7 @@ function App() {
   const [playerKeys, setPlayerKeys] = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
+  const [errMessage, setErrMessage] = useState(null)
 
   const players = useRef(null)
   const playersRef = useRef(null)
@@ -54,6 +55,15 @@ function App() {
         getMedia(stream)
         setLoading(false)
       })
+    })
+    .catch(err => {
+      console.log(err.message)
+      if(err.message === 'Permission denied'){
+        setErrMessage('Please allow camera and microphone access to use this app')
+      }
+      if(err.message === 'Device in use'){
+        setErrMessage('Camera or microphone is already in use, please close all other apps using the camera and microphone')
+      }
     })
     return () => socket.current.off('get-all-users')
   }, [])
@@ -195,6 +205,12 @@ function App() {
 
   return (
     <div className='h-screen w-screen'>
+    {
+      errMessage ?
+      <h1 className='text-center text-2xl'>{errMessage}</h1>
+      :
+      <>
+
       <div id='videos' className='fixed top-0 right-0 hidden'>
         {
           videosComponent &&
@@ -235,6 +251,8 @@ function App() {
         :
         <h1>Loading...</h1>
       }
+      </>
+    }
     </div>
   )
 }
