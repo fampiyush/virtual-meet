@@ -10,7 +10,9 @@ export const connectSocket = (room) => {
             socket.emit('join', room)
             socket.on('joined-room', (room) => {
                 if(room){
-                    resolve({ socket, peer, room });
+                    peer.on('open', () => {
+                        resolve({ socket, peer, room });
+                    })
                 }else {
                     resolve(room)
                 }

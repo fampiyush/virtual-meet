@@ -95,14 +95,12 @@ function App() {
           })
         })
       })
-      peer.current.on('open', () => {
         console.log('Me', peer.current.id)
         sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id, room:room.current})
         getPlayers()
         updatePlayers()
         setVideos({[peer.current.id]: stream})
         setVideosComponent([peer.current.id])
-      })
   }
 
   useEffect(() => {
