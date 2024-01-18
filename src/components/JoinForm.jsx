@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { connectSocket } from '../helpers/socketConnection';
+import { PlayerContext } from '../helpers/contextProvider';
 
 const JoinForm = ({setFormDone, peer, socket, room}) => {
     const [meetingId, setMeetingId] = useState('');
+    const [name, setName] = useState('');
+    const {setMyName} = useContext(PlayerContext)
 
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle form submission logic here
+        if(!name){
+            alert('Please enter your name')
+            return
+        }
+
         if(!meetingId){
             alert('Please enter a meeting ID')
         }else {
@@ -15,6 +23,7 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
                     socket.current = value.socket
                     peer.current = value.peer
                     room.current = value.room
+                    setMyName([name])
                     setFormDone(true)
                 }else {
                     alert('Meeting ID does not exist')
@@ -25,10 +34,16 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
 
     const onNewMeet = () => {
         // Handle new meeting logic here
+
+        if(!name){
+            alert('Please enter your name')
+            return
+        }
         connectSocket().then((value) => {
             socket.current = value.socket
             peer.current = value.peer
             room.current = value.room
+            setMyName([name])
             setFormDone(true)
         })
     }
@@ -37,6 +52,16 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
         <div className="flex items-center justify-center h-screen">
             <div>
                 <h1 className='mb-8 text-xl text-center'>Virtual Meet</h1>
+                <div className='mb-4 ml-9'>
+                    <label htmlFor="name">Name: </label>
+                    <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className='mr-2 px-2'
+                    />
+                </div>
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="meetingId">Meeting ID: </label>
                     <input

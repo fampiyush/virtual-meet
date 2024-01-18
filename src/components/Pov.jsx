@@ -1,17 +1,21 @@
-import React, {useRef, useMemo} from 'react'
+import React, {useRef, useMemo, useContext} from 'react'
 import useKeyboard from '../helpers/useKeyboard'
 import { sendModel } from '../helpers/socketConnection'
 import { useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, PointerLockControls } from '@react-three/drei'
+import { PlayerContext } from '../helpers/contextProvider'
 import * as THREE from 'three'
 
 const Pov = ({socket, peer, room}) => {
+
+    const {myName} = useContext(PlayerContext)
+
     const povRef = useRef(null)
     povRef.current = useMemo(() => new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000), []) 
     const keyMap = useKeyboard()
 
     const onChange = () => {
-      sendModel(socket.current, {position: povRef.current.position, rotation: povRef.current.rotation, peerId: peer.current.id, room:room.current})
+      sendModel(socket.current, {position: povRef.current.position, rotation: povRef.current.rotation, peerId: peer.current.id, room:room.current, name: myName})
     }
     
     useFrame((_, delta) => {

@@ -14,7 +14,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   // const [players, setPlayers] = useState(null)
 
-  const [playerKeys, setPlayerKeys] = useContext(PlayerContext)
+  const {playerKeys, setPlayerKeys, myName} = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [errMessage, setErrMessage] = useState(null)
@@ -96,7 +96,7 @@ function App() {
         })
       })
         console.log('Me', peer.current.id)
-        sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id, room:room.current})
+        sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id, room:room.current, name: myName})
         getPlayers()
         updatePlayers()
         setVideos({[peer.current.id]: stream})
@@ -243,7 +243,7 @@ function App() {
               playerKeys &&
               playerKeys.map((key, index) => {
                 return (
-                  <PlayerModel refe={key.socketId} key={key.socketId} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} />
+                  <PlayerModel refe={key.socketId} key={key.socketId} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} name={players.current[key.socketId].name} />
                 )
               })
             }
