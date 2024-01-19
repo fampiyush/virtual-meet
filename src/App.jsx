@@ -55,7 +55,6 @@ function App() {
       }).then(stream => {
         console.log(room.current)
           getMedia(stream)
-          console.log(materials)
           setLoading(false)
       })
       .catch(err => {
