@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useRef, useState, useMemo, useContext } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, useHelper, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import { connectSocket, sendModel } from './helpers/socketConnection'
@@ -8,6 +8,7 @@ import { PlayerContext } from './helpers/contextProvider'
 import PlayerModel from './components/PlayerModel'
 import Pov from './components/Pov'
 import JoinForm from './components/JoinForm'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 function App() {
 
@@ -40,6 +41,8 @@ function App() {
     return videoRef.current
   }
   
+  const { nodes, materials } = useLoader(GLTFLoader, '/television.glb');
+  materials['Scene_-_Root'].color = new THREE.Color('grey')
   let peer = useRef(null)
   let socket = useRef(null)
   let room = useRef(null)
@@ -52,6 +55,7 @@ function App() {
       }).then(stream => {
         console.log(room.current)
           getMedia(stream)
+          console.log(materials)
           setLoading(false)
       })
       .catch(err => {
@@ -65,6 +69,7 @@ function App() {
       })
     }
   }, [formDone])
+
 
   const Plane = () => {
     return (
@@ -243,7 +248,16 @@ function App() {
               playerKeys &&
               playerKeys.map((key, index) => {
                 return (
-                  <PlayerModel refe={key.socketId} key={key.socketId} position={players.current[key.socketId].position} rotation={players.current[key.socketId].rotation} getMap={getMap} video={videos ? videos[key.peerId] : null} name={players.current[key.socketId].name} />
+                  <PlayerModel
+                    refe={key.socketId} 
+                    key={key.socketId} 
+                    position={players.current[key.socketId].position} 
+                    rotation={players.current[key.socketId].rotation} 
+                    getMap={getMap} 
+                    video={videos ? videos[key.peerId] : null} 
+                    name={players.current[key.socketId].name} 
+                    nodes={nodes} 
+                    materials={materials} />
                 )
               })
             }

@@ -20,6 +20,8 @@ const PlayerModel = memo((value) => {
       rotation: value.rotation,
       name: value.name,
       video: value.video,
+      nodes: value.nodes,
+      materials: value.materials
     }),
     [value]
     )
@@ -47,11 +49,11 @@ const PlayerModel = memo((value) => {
       <PlayerName />
       <mesh>
           <boxGeometry args={[0.3, 0.2, 0]} />
-          <meshBasicMaterial color='red' attach="material-0" />
-          <meshBasicMaterial color='red' attach="material-1" />
-          <meshBasicMaterial color='red' attach="material-2" />
-          <meshBasicMaterial color='red' attach="material-3" />
-          <meshBasicMaterial color='red' attach="material-4" />
+          <meshBasicMaterial color='black' attach="material-0" />
+          <meshBasicMaterial color='black' attach="material-1" />
+          <meshBasicMaterial color='black' attach="material-2" />
+          <meshBasicMaterial color='black' attach="material-3" />
+          <meshBasicMaterial color='black' attach="material-4" />
           {
             playerData.video ?
             <VideoMaterial src={playerData.video} attach="material-5" />
@@ -59,6 +61,7 @@ const PlayerModel = memo((value) => {
             <meshBasicMaterial color='yellow' attach="material-5" />
           }
       </mesh>
+      <mesh geometry={playerData.nodes.TV__0.geometry} material={playerData.materials['Scene_-_Root']} scale={[0.095, 0.11, 0.1]} position={[0, 0, 0.007]} rotation={[0, Math.PI, 0]} />
     </group>
   )
 })
