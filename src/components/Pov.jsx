@@ -35,7 +35,7 @@ const Pov = ({socket, peer, room}) => {
             povRef.current &&
             <>
             <PerspectiveCamera ref={povRef} position={[0, 0.2, 2]} rotation={[0,0,0]} makeDefault={true} />
-            <PointerLockControls onChange={onChange} />
+            <PointerLockControls selector='#canvas' onChange={onChange} />
             </>
           }
       </>

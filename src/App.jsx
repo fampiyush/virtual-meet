@@ -5,10 +5,11 @@ import { OrbitControls, useHelper, Stats } from '@react-three/drei'
 import * as THREE from 'three'
 import { connectSocket, sendModel } from './helpers/socketConnection'
 import { PlayerContext } from './helpers/contextProvider'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import PlayerModel from './components/PlayerModel'
 import Pov from './components/Pov'
 import JoinForm from './components/JoinForm'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import BottomBar from './components/BottomBar'
 
 function App() {
 
@@ -18,14 +19,18 @@ function App() {
   const {playerKeys, setPlayerKeys, myName} = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
+  const [audios, setAudios] = useState({})
   const [errMessage, setErrMessage] = useState(null)
   const [formDone, setFormDone] = useState(false)
+  const [videoStream, setVideoStream] = useState(false)
+  const [audioStream, setAudioStream] = useState(false)
 
   const players = useRef(null)
   const playersRef = useRef(null)
   // const videos = useRef(null)
   const videoRef = useRef(null)
-  const streamRef = useRef(null)
+  const videoStreamRef = useRef(null)
+  const audioStreamRef = useRef(null)
 
   const getMap = () => {
     if(!playersRef.current){
@@ -41,33 +46,89 @@ function App() {
     return videoRef.current
   }
   
-  const { nodes, materials } = useLoader(GLTFLoader, '/television.glb');
-  materials['Scene_-_Root'].color = new THREE.Color('grey')
+
+  const {nodes, materials} = useLoader(GLTFLoader, '/television.glb');
+  materials['Scene_-_Root'].color = new THREE.Color('grey');
+
+
   let peer = useRef(null)
   let socket = useRef(null)
   let room = useRef(null)
   useEffect(() => {
     if(formDone){
-      var getUserMedia = navigator.mediaDevices.getUserMedia
-      getUserMedia({
-        video: true,
-        audio: true
-      }).then(stream => {
-        console.log(room.current)
-          getMedia(stream)
-          setLoading(false)
-      })
-      .catch(err => {
-        console.log(err.message)
-        if(err.message === 'Permission denied'){
-          setErrMessage('Please allow camera and microphone access to use this app')
-        }
-        if(err.message === 'Device in use'){
-          setErrMessage('Camera or microphone is already in use, please close all other apps using the camera and microphone')
-        }
-      })
+      console.log(room.current)
+      getMedia()
+      setLoading(false)
     }
   }, [formDone])
+
+  useEffect(() => {
+    if(!videoStream && videoStreamRef.current){
+      videoStreamRef.current.getTracks().forEach((track) => {
+        if(track.kind === 'video'){
+          track.stop()
+        }
+      })
+      return
+    }else if(!videoStream && !videoStreamRef.current){
+      return
+    }
+    const getMediaStream = () => {
+        const getUserMedia = navigator.mediaDevices.getUserMedia
+        getUserMedia({
+          video: true,
+          audio: false
+        }).then(stream => {
+          videoStreamRef.current = stream
+          playerKeys.forEach((key) => {
+            connectToNewUser(key.peerId, stream)
+          })
+        })
+        .catch(err => {
+          if(err.message === 'Permission denied'){
+            setErrMessage('Please allow camera access to use this app')
+          }
+          if(err.message === 'Device in use'){
+            setErrMessage('Camera is already in use, please close all other apps using the camera')
+          }
+        })
+    }
+    getMediaStream()
+  },[videoStream])
+
+  useEffect(() => {
+    if(!audioStream && audioStreamRef.current){
+      audioStreamRef.current.getTracks().forEach((track) => {
+        if(track.kind === 'audio'){
+          track.stop()
+        }
+      })
+      return
+    }else if(!audioStream && !audioStreamRef.current){
+      return
+    }
+    const getMediaStream = () => {
+        const getUserMedia = navigator.mediaDevices.getUserMedia
+        getUserMedia({
+          video: videoStream,
+          audio: audioStream
+        }).then(stream => {
+          audioStreamRef.current = stream
+          playerKeys.forEach((key) => {
+            connectToNewUser(key.peerId, stream)
+          })
+        })
+        .catch(err => {
+          if(err.message === 'Permission denied'){
+            setErrMessage('Please allow microphone access to use this app')
+          }
+          if(err.message === 'Device in use'){
+            setErrMessage('Microphone is already in use, please close all other apps using the microphone')
+          }
+        })
+    }
+    getMediaStream()
+  },[audioStream])
 
 
   const Plane = () => {
@@ -79,31 +140,41 @@ function App() {
     )
   }
 
-  const getMedia = (stream) => {
-      streamRef.current = stream
+  const getMedia = () => {
       peer.current.on('call', call => {
-        call.answer(stream)
-        call.on('stream', userVideoStream => {
+        call.answer()
+        call.on('stream', userStream => {
           console.log('receiving from', call.peer)
-          if(!videos[call.peer]){
-          setVideos((prev) => {
-            return {...prev, [call.peer]: userVideoStream}
-          })
-          }
-          setVideosComponent((prev) => {
-            if(!prev.includes(call.peer)){
-              return [...prev, call.peer]
-            }else {
-              return prev
+          const type = userStream.getTracks()[0]
+          if(type.kind === 'video'){
+            if(!videos[call.peer]){
+            setVideos((prev) => {
+              return {...prev, [call.peer]: userStream}
+            })
             }
-          })
+            setVideosComponent((prev) => {
+              if(!prev.includes(call.peer)){
+                return [...prev, call.peer]
+              }else {
+                return prev
+              }
+            })
+          }
+
+          if(type.kind === 'audio'){
+            if(!audios[call.peer]){
+              setAudios((prev) => {
+                return {...prev, [call.peer]: userStream}
+              })
+            }
+          }
         })
       })
         console.log('Me', peer.current.id)
         sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id, room:room.current, name: myName})
         getPlayers()
         updatePlayers()
-        setVideos({[peer.current.id]: stream})
+        // setVideos({[peer.current.id]: stream})
         setVideosComponent([peer.current.id])
   }
 
@@ -126,7 +197,7 @@ function App() {
         video.muted = true
       }
       video.className = 'w-24'
-      video.play()
+      // video.play()
     }
   }
 
@@ -145,7 +216,12 @@ function App() {
       setPlayerKeys((prev) => {
         const socketIds = prev.map((key) => key.socketId)
         if(!socketIds.includes(id)){
-          connectToNewUser(player.data.peerId)
+          if(audioStreamRef.current){
+            connectToNewUser(player.data.peerId, audioStreamRef.current)
+          }
+          if(videoStreamRef.current){
+            connectToNewUser(player.data.peerId, videoStreamRef.current)
+          }
           return [...prev, {socketId: id, peerId: player.data.peerId}]
         }else {
           return prev
@@ -186,23 +262,10 @@ function App() {
     })
   }
 
-  const connectToNewUser = (id) => {
-    const call = peer.current.call(id, streamRef.current)
+  const connectToNewUser = (id, stream) => {
+    const call = peer.current.call(id, stream)
+      
     console.log('calling', id)
-    call.on('stream', userVideoStream => {
-      if(!videos[id]){
-      setVideos((prev) => {
-        return {...prev, [id]: userVideoStream}
-      })
-      }
-      setVideosComponent((prev) => {
-        if(!prev.includes(id)){
-          return [...prev, id]
-        }else {
-          return prev
-        }
-      })
-    })
   }
 
   return (
@@ -217,27 +280,28 @@ function App() {
         <h1 className='text-center text-2xl'>{errMessage}</h1>
         :
         <>
-
-        <div id='videos' className='fixed top-0 right-0 hidden'>
-          {
-            videosComponent &&
-            videosComponent.map((video, index) => {
-              return (
-                <video ref={(e) => {
-                  const map = getVideo()
-                  if(e){
-                    map.set(video, e)
-                  }else {
-                    map.delete(video)
-                  }
-                }} key={index} autoPlay />
-              )
-            })
-          }
-        </div>
         {
           !loading ?
-          <Canvas camera={{position: [0, 0.5, 0.3]}}>
+          <>
+          <div id='videos' className='fixed top-0 right-0 hidden'>
+            {
+              videosComponent &&
+              videosComponent.map((video, index) => {
+                return (
+                  <video ref={(e) => {
+                    const map = getVideo()
+                    if(e){
+                      map.set(video, e)
+                    }else {
+                      map.delete(video)
+                    }
+                  }} key={index} />
+                )
+              })
+            }
+          </div>
+          <BottomBar setVideoStream={setVideoStream} setAudioStream={setAudioStream} />
+          <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
             <Plane />
             {
               (socket.current && peer.current) &&
@@ -253,10 +317,11 @@ function App() {
                     position={players.current[key.socketId].position} 
                     rotation={players.current[key.socketId].rotation} 
                     getMap={getMap} 
-                    video={videos ? videos[key.peerId] : null} 
+                    video={videos ? videos[key.peerId] : null}
+                    audio={audios ? audios[key.peerId] : null} 
                     name={players.current[key.socketId].name} 
                     nodes={nodes} 
-                    materials={materials} />
+                    materials={materials} videos={videos} />
                 )
               })
             }
@@ -264,6 +329,7 @@ function App() {
             {/* <OrbitControls /> */}
             <Stats />
           </Canvas>
+          </>
           :
           <h1>Loading...</h1>
         }
