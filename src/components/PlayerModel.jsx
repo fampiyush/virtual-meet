@@ -24,7 +24,8 @@ const PlayerModel = memo((value) => {
       video: value.video,
       audio: value.audio,
       nodes: value.nodes,
-      materials: value.materials
+      materials: value.materials,
+      placeHolder: value.placeHolder
     }),
     [value]
     )
@@ -75,7 +76,7 @@ const PlayerModel = memo((value) => {
     var audio = new Audio();
     audio.srcObject = stream;
     var gainNode = ctx.createGain();
-    gainNode.gain.value = .5;   
+    gainNode.gain.value = 0.5;   
     audio.onloadedmetadata = function() {
         var source = ctx.createMediaStreamSource(audio.srcObject);
         audio.play();
@@ -106,14 +107,14 @@ const PlayerModel = memo((value) => {
           <meshBasicMaterial color='black' attach="material-4" />
           {
             isVideo ?
-            <Suspense fallback={<meshBasicMaterial color='yellow' attach="material-5" />}>
+            <Suspense fallback={<meshBasicMaterial color='black' attach="material-5" />}>
               <VideoMaterial src={playerData.video} attach="material-5" />
             </Suspense>
             :
-            <meshBasicMaterial color='yellow' attach="material-5" />
+            <meshBasicMaterial map={playerData.placeHolder} attach="material-5" />
           }
       </mesh>
-      <mesh geometry={playerData.nodes.TV__0.geometry} material={playerData.materials['Scene_-_Root']} scale={[0.095, 0.11, 0.1]} position={[0, 0, 0.007]} rotation={[0, Math.PI, 0]} />
+      <mesh geometry={playerData.nodes.TV__0.geometry} material={playerData.materials['Scene_-_Root']} scale={[0.091, 0.105, 0.1]} position={[0, 0.001, 0.007]} rotation={[0, Math.PI, 0]} />
     </group>
   )
 })

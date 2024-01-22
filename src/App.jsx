@@ -49,6 +49,7 @@ function App() {
   const {nodes, materials} = useLoader(GLTFLoader, '/television.glb');
   materials['Scene_-_Root'].color = new THREE.Color('grey');
 
+  const placeHolder = useLoader(THREE.TextureLoader, '/placeholder.jpg')
 
   let peer = useRef(null)
   let socket = useRef(null)
@@ -315,7 +316,9 @@ function App() {
                     audio={audios ? audios[key.peerId] : null} 
                     name={players.current[key.socketId].name} 
                     nodes={nodes} 
-                    materials={materials} videos={videos} />
+                    materials={materials} videos={videos}
+                    placeHolder={placeHolder}
+                     />
                 )
               })
             }
