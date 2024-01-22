@@ -20,7 +20,6 @@ function App() {
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [audios, setAudios] = useState({})
-  const [errMessage, setErrMessage] = useState(null)
   const [formDone, setFormDone] = useState(false)
   const [videoStream, setVideoStream] = useState(false)
   const [audioStream, setAudioStream] = useState(false)
@@ -86,10 +85,10 @@ function App() {
         })
         .catch(err => {
           if(err.message === 'Permission denied'){
-            setErrMessage('Please allow camera access to use this app')
+            alert('Please allow camera access to use this app')
           }
           if(err.message === 'Device in use'){
-            setErrMessage('Camera is already in use, please close all other apps using the camera')
+            alert('Camera is already in use, please close all other apps using the camera')
           }
         })
     }
@@ -120,10 +119,10 @@ function App() {
         })
         .catch(err => {
           if(err.message === 'Permission denied'){
-            setErrMessage('Please allow microphone access to use this app')
+            alert('Please allow microphone access to use this app')
           }
           if(err.message === 'Device in use'){
-            setErrMessage('Microphone is already in use, please close all other apps using the microphone')
+            alert('Microphone is already in use, please close all other apps using the microphone')
           }
         })
     }
@@ -275,11 +274,6 @@ function App() {
       <JoinForm setFormDone={setFormDone} peer={peer} socket={socket} room={room} />
       :
       <>
-      {
-        errMessage ?
-        <h1 className='text-center text-2xl'>{errMessage}</h1>
-        :
-        <>
         {
           !loading ?
           <>
@@ -334,8 +328,6 @@ function App() {
           <h1>Loading...</h1>
         }
         </>
-      }
-      </>
     }
     </div>
   )
