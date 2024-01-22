@@ -32,7 +32,7 @@ const PlayerModel = memo((value) => {
     
   const PlayerName = () => {
     return (
-      <Html distanceFactor={1}>
+      <Html distanceFactor={1} position={[-0.01, 0.001, 0.001]}>
         <div className='flex items-center justify-center h-10 w-20 bg-gray-900 text-white rounded absolute bottom-28 -right-8'>
           {playerData.name}
         </div>
