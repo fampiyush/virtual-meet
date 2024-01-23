@@ -86,11 +86,12 @@ function App() {
         })
         .catch(err => {
           if(err.message === 'Permission denied'){
-            alert('Please allow camera access to use this app')
+            alert('Please allow camera access to use the video camera')
           }
           if(err.message === 'Device in use'){
             alert('Camera is already in use, please close all other apps using the camera')
           }
+          setVideoStream(false)
         })
     }
     getMediaStream()
@@ -120,11 +121,12 @@ function App() {
         })
         .catch(err => {
           if(err.message === 'Permission denied'){
-            alert('Please allow microphone access to use this app')
+            alert('Please allow microphone access to use the global mic')
           }
           if(err.message === 'Device in use'){
             alert('Microphone is already in use, please close all other apps using the microphone')
           }
+          setAudioStream(false)
         })
     }
     getMediaStream()
@@ -295,7 +297,7 @@ function App() {
               })
             }
           </div>
-          <BottomBar setVideoStream={setVideoStream} setAudioStream={setAudioStream} />
+          <BottomBar setVideoStream={setVideoStream} setAudioStream={setAudioStream} videoStream={videoStream} audioStream={audioStream} />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
             <Plane />
             {
