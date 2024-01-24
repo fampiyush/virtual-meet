@@ -6,13 +6,11 @@ import { LuRadioTower } from "react-icons/lu"
 const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) => {
 
     const [globalMicButton, setGlobalMicButton] = useState(false)
-    const [globalMicDisabled, setGlobalMicDisabled] = useState(false)
     const [localMic, setLocalMic] = useState(false)
     const [videoButton, setVideoButton] = useState(false)
     const [videoDisabled, setVideoDisabled] = useState(false)
 
     const debouncedSetVideoStream = debounce(setVideoStream, 500)
-    const debouncedSetAudioStream = debounce(setAudioStream, 500)
 
     useEffect(() => {
         const onDocumentKey = (e) => {
@@ -42,19 +40,13 @@ const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) =
 
       const handleAudio = () => {
         setGlobalMicButton(!globalMicButton)
-        setGlobalMicDisabled(true)
-
-        setTimeout(() => {
-            setGlobalMicDisabled(false)
-        }, 500)
-
-        debouncedSetAudioStream((prev) => !prev)
+        setAudioStream((prev) => !prev)
       }
 
   return (
     <div className='fixed w-[100%] bottom-2 flex text-center justify-center z-10'>
         <div className='flex min-w-[15%] justify-between bg-gray-300 px-2 rounded'>
-            <div onClick={handleAudio} className={`px-1 pt-1 hover:bg-white rounded ${globalMicDisabled ? 'disabled opacity-40' : ''}`}>
+            <div onClick={handleAudio} className='px-1 pt-1 hover:bg-white rounded'>
                 {
                     audioStream ?
                     <BsMicFill color='#5c89d1' size={40} title='Global Mic, Hold Spacebar for push to talk' />

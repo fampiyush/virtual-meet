@@ -97,39 +97,53 @@ function App() {
     getMediaStream()
   },[videoStream])
 
+  const getMediaStreamAudio = (keys) => {
+      const getUserMedia = navigator.mediaDevices.getUserMedia
+      getUserMedia({
+        video: false,
+        audio: true
+      }).then(stream => {
+        stream.getTracks().forEach((track) => {
+          if(track.kind === 'audio'){
+            track.enabled = false
+          }
+        })
+        audioStreamRef.current = stream
+        keys.forEach((key) => {
+          connectToNewUser(key.peerId, stream)
+        })
+      })
+      .catch(err => {
+        if(err.message === 'Permission denied'){
+          alert('Please allow microphone access to use the global mic')
+        }
+        if(err.message === 'Device in use'){
+          alert('Microphone is already in use, please close all other apps using the microphone')
+        }
+        setAudioStream(false)
+      })
+  }
   useEffect(() => {
     if(!audioStream && audioStreamRef.current){
       audioStreamRef.current.getTracks().forEach((track) => {
         if(track.kind === 'audio'){
-          track.stop()
+          track.enabled = false
         }
       })
       return
-    }else if(!audioStream && !audioStreamRef.current){
-      return
     }
-    const getMediaStream = () => {
-        const getUserMedia = navigator.mediaDevices.getUserMedia
-        getUserMedia({
-          video: videoStream,
-          audio: audioStream
-        }).then(stream => {
-          audioStreamRef.current = stream
-          playerKeys.forEach((key) => {
-            connectToNewUser(key.peerId, stream)
-          })
-        })
-        .catch(err => {
-          if(err.message === 'Permission denied'){
-            alert('Please allow microphone access to use the global mic')
-          }
-          if(err.message === 'Device in use'){
-            alert('Microphone is already in use, please close all other apps using the microphone')
-          }
-          setAudioStream(false)
-        })
+
+    if(audioStream && audioStreamRef.current){
+      audioStreamRef.current.getTracks().forEach((track) => {
+        if(track.kind === 'audio'){
+          track.enabled = true
+        }
+      })
     }
-    getMediaStream()
+
+    if(audioStream && !audioStreamRef.current){
+      getMediaStreamAudio(playerKeys)
+    }
   },[audioStream])
 
 
@@ -208,7 +222,11 @@ function App() {
     socket.current.on('all-users', (player) => {
       players.current = player
       const keys = Object.entries(player).map(([key, value]) => ({ socketId: key, peerId: value.peerId }))
-      setPlayerKeys(keys)
+      getMediaStreamAudio(keys)
+      setPlayerKeys((prev) => {
+        keys.filter((key) => !prev.includes(key.socketId))
+        return [...prev, ...keys]
+      });
     })
   }
 
