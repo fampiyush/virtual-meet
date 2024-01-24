@@ -19,13 +19,14 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
             alert('Please enter a meeting ID')
         }else {
             connectSocket(meetingId).then((value) => {
-                if(value){
+                if(value && value.room){
                     socket.current = value.socket
                     peer.current = value.peer
                     room.current = value.room
                     setMyName([name])
                     setFormDone(true)
                 }else {
+                    value.socket.disconnect()
                     alert('Meeting ID does not exist')
                 }
             })

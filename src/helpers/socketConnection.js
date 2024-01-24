@@ -14,7 +14,7 @@ export const connectSocket = (room) => {
                         resolve({ socket, peer, room });
                     })
                 }else {
-                    resolve(room)
+                    resolve({socket, room})
                 }
             })
         });
