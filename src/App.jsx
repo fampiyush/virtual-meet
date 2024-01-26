@@ -16,7 +16,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   // const [players, setPlayers] = useState(null)
 
-  const {playerKeys, setPlayerKeys, myName} = useContext(PlayerContext)
+  const {playerKeys, setPlayerKeys, myName, setPeerConn} = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [audios, setAudios] = useState({})
@@ -30,6 +30,7 @@ function App() {
   const videoRef = useRef(null)
   const videoStreamRef = useRef(null)
   const audioStreamRef = useRef(null)
+  const povRef = useRef(null)
 
   const getMap = () => {
     if(!playersRef.current){
@@ -187,11 +188,30 @@ function App() {
         })
       })
         console.log('Me', peer.current.id)
-        sendModel(socket.current, {position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, peerId: peer.current.id, room:room.current, name: myName})
+        sendModel(socket.current, {peerId: peer.current.id, room:room.current, name: myName})
         getPlayers()
-        updatePlayers()
+        onDisconnect()
         // setVideos({[peer.current.id]: stream})
         setVideosComponent([peer.current.id])
+
+        peer.current.on('connection', (conn) => {
+          conn.on('open', () => {
+            setPeerConn((prev) => [...prev, conn])
+            if(povRef.current){
+              const position = { x: povRef.current.position.x, y: povRef.current.position.y, z: povRef.current.position.z };
+              const rotation = { _x: povRef.current.rotation._x, _y: povRef.current.rotation._y, _z: povRef.current.rotation._z };
+              conn.send({ position: position, rotation: rotation, socketId: socket.current.id, peerId: peer.current.id, room: room.current, name: myName });
+            }else {
+              conn.send({position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
+            }
+          })
+          conn.on('data', (data) => {
+            if(!players.current){
+              players.current = {[data.socketId]: data}
+            }
+            updatePlayers(data)
+          })
+        })
   }
 
   useEffect(() => {
@@ -220,66 +240,85 @@ function App() {
   const getPlayers = () => {
     socket.current.emit('get-all-users')
     socket.current.on('all-users', (player) => {
-      players.current = player
+      // players.current = player
       const keys = Object.entries(player).map(([key, value]) => ({ socketId: key, peerId: value.peerId }))
       getMediaStreamAudio(keys)
-      setPlayerKeys((prev) => {
-        keys.filter((key) => !prev.includes(key.socketId))
-        return [...prev, ...keys]
-      });
+
+      keys.forEach((key) => {
+        const conn = peer.current.connect(key.peerId)
+        conn.on('open', () => {
+          conn.send({position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
+          setPeerConn((prev) => [...prev, conn])
+        })
+        conn.on('data', (data) => {
+          if(!players.current){
+            players.current = {[data.socketId]: data}
+          }
+          updatePlayers(data)
+        })
+      })
     })
   }
 
-  const updatePlayers = () => {
-    socket.current.on('user-model', (player) => {
-      const id = player.id
+  const updatePlayers = (data) => {
+      const id = data.socketId
+      if(!players.current[id]){
+        players.current = {...players.current, [id]: data}
+      }
       setPlayerKeys((prev) => {
         const socketIds = prev.map((key) => key.socketId)
         if(!socketIds.includes(id)){
           if(audioStreamRef.current){
-            connectToNewUser(player.data.peerId, audioStreamRef.current)
+            connectToNewUser(data.peerId, audioStreamRef.current)
           }
           if(videoStreamRef.current){
-            connectToNewUser(player.data.peerId, videoStreamRef.current)
+            connectToNewUser(data.peerId, videoStreamRef.current)
           }
-          return [...prev, {socketId: id, peerId: player.data.peerId}]
+          return [...prev, {socketId: id, peerId: data.peerId}]
         }else {
           return prev
         }
       })
-      players.current = {...players.current, [id]: player.data}
       if(playersRef.current){
         const currPlayer = playersRef.current.get(id)
         if(currPlayer){
-          currPlayer.position.set(player.data.position.x, player.data.position.y, player.data.position.z)
-          currPlayer.rotation.set(player.data.rotation._x, player.data.rotation._y, player.data.rotation._z)
+          currPlayer.position.set(data.position.x, data.position.y, data.position.z)
+          currPlayer.rotation.set(data.rotation._x, data.rotation._y, data.rotation._z)
         }
       }
-    })
-    socket.current.on('user-disconnected', (player) => {
-      const id = player.socketId
-      setPlayerKeys((prev) => {
-        return prev.filter((key) => key.socketId !== id)
-      })
-      players.current[id] = null
-      if(playersRef.current){
-        const currPlayer = playersRef.current.get(id)
-        if(currPlayer){
-          playersRef.current.delete(id)
+
+    }
+    
+    const onDisconnect = () => {
+      socket.current.on('user-disconnected', (player) => {
+        const id = player.socketId
+        setPlayerKeys((prev) => {
+          return prev.filter((key) => key.socketId !== id)
+        })
+        players.current[id] = null
+        if(playersRef.current){
+          const currPlayer = playersRef.current.get(id)
+          if(currPlayer){
+            playersRef.current.delete(id)
+          }
         }
-      }
-      const peerId = player.peerId
-      setVideosComponent((prev) => {
-        return prev.filter((key) => key !== peerId)
-      })
-      videos[peerId] = null
-      if(videoRef.current){
-        const currVideo = videoRef.current.get(peerId)
-        if(currVideo){
-          videoRef.current.delete(peerId)
+        const peerId = player.peerId
+        setVideosComponent((prev) => {
+          return prev.filter((key) => key !== peerId)
+        })
+        videos[peerId] = null
+        if(videoRef.current){
+          const currVideo = videoRef.current.get(peerId)
+          if(currVideo){
+            videoRef.current.delete(peerId)
+          }
         }
-      }
-    })
+        setPeerConn((prev) => {
+          const conn = prev.find((conn) => conn.peer === peerId)
+          conn.close()
+          return prev.filter((conn) => conn.peer !== peerId)
+        })
+      }) 
   }
 
   const connectToNewUser = (id, stream) => {
@@ -320,7 +359,7 @@ function App() {
             <Plane />
             {
               (socket.current && peer.current) &&
-              <Pov socket={socket} peer={peer} room={room} />
+              <Pov socket={socket} peer={peer} room={room} povRef={povRef} />
             }
             {
               playerKeys &&
