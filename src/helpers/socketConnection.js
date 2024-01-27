@@ -3,13 +3,16 @@ import { Peer } from "peerjs"
 
 export const connectSocket = (room) => {
     const socket = io(import.meta.env.VITE_BACKEND_URL);
-    const peer = new Peer();
 
     const promise = new Promise((resolve) => {
         socket.on("connect", () => {
             socket.emit('join', room)
             socket.on('joined-room', (room) => {
                 if(room){
+                    const peer = new Peer({
+                        host: (import.meta.env.VITE_PEER_HOST),
+                        secure: true,
+                    });
                     peer.on('open', () => {
                         resolve({ socket, peer, room });
                     })

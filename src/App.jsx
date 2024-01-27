@@ -77,7 +77,10 @@ function App() {
     const getMediaStream = () => {
         const getUserMedia = navigator.mediaDevices.getUserMedia
         getUserMedia({
-          video: true,
+          video: {
+            width: {max: 640},
+            height: {max: 480}
+          },
           audio: false
         }).then(stream => {
           videoStreamRef.current = stream
