@@ -7,9 +7,9 @@ import { PerspectiveCamera, PointerLockControls } from '@react-three/drei'
 import { PlayerContext } from '../helpers/contextProvider'
 import * as THREE from 'three'
 
-const Pov = ({socket, peer, room, povRef}) => {
+const Pov = ({socket, povRef}) => {
 
-    const {myName, peerConn} = useContext(PlayerContext)
+    const {peerConn} = useContext(PlayerContext)
 
     povRef.current = useMemo(() => new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000), []) 
     const keyMap = useKeyboard()
@@ -18,7 +18,7 @@ const Pov = ({socket, peer, room, povRef}) => {
       Promise.all(peerConn.map(async (conn) => {
         const position = { x: povRef.current.position.x, y: povRef.current.position.y, z: povRef.current.position.z };
         const rotation = { _x: povRef.current.rotation._x, _y: povRef.current.rotation._y, _z: povRef.current.rotation._z };
-        conn.send({ position: position, rotation: rotation, socketId: socket.current.id, peerId: peer.current.id, room: room.current, name: myName });
+        conn.send({ position: position, rotation: rotation, socketId: socket.current.id });
       }));
     }
     

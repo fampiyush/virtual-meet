@@ -191,7 +191,7 @@ function App() {
         })
       })
         console.log('Me', peer.current.id)
-        sendModel(socket.current, {peerId: peer.current.id, room:room.current, name: myName})
+        sendModel(socket.current, {peerId: peer.current.id, room: room.current, name: myName})
         getPlayers()
         onDisconnect()
         // setVideos({[peer.current.id]: stream})
@@ -362,7 +362,7 @@ function App() {
             <Plane />
             {
               (socket.current && peer.current) &&
-              <Pov socket={socket} peer={peer} room={room} povRef={povRef} />
+              <Pov socket={socket} povRef={povRef} />
             }
             {
               playerKeys &&
