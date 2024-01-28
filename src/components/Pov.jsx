@@ -23,12 +23,11 @@ const Pov = ({socket, povRef}) => {
       }));
     }
     
-    const throttleOnChange = useRef();
+    const throttleOnChange = throttle(onChange, 20);
     useEffect(() => {
-      throttleOnChange.current = throttle(onChange, 20);
+
       return () => {
-        // Clear the debounced function on cleanup
-        clearTimeout(throttleOnChange.current.cancel);
+        clearTimeout(throttleOnChange.cancel);
       };
     }, []);
 
@@ -39,11 +38,9 @@ const Pov = ({socket, povRef}) => {
       keyMap['KeyS'] && (povRef.current.translateZ(delta))
       povRef.current.position.y = 0.2
       if(keyMap['KeyA'] || keyMap['KeyD'] || keyMap['KeyW'] || keyMap['KeyS']) {
-        throttleOnChange.current()
+        throttleOnChange()
       }
     })
-
-
   
     return (
     <>
@@ -51,7 +48,7 @@ const Pov = ({socket, povRef}) => {
             povRef.current &&
             <>
             <PerspectiveCamera ref={povRef} position={[0, 0.2, 2]} rotation={[0,0,0]} makeDefault={true} />
-            <PointerLockControls selector='#canvas' onChange={() => throttleOnChange.current()} />
+            <PointerLockControls selector='#canvas' onChange={() => throttleOnChange()} />
             </>
           }
       </>
