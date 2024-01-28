@@ -15,7 +15,6 @@ const Pov = ({socket, povRef}) => {
     const keyMap = useKeyboard()
 
     const onChange = () => {
-      console.log('first')
       Promise.all(peerConn.map(async (conn) => {
         const position = { x: povRef.current.position.x, y: povRef.current.position.y, z: povRef.current.position.z };
         const rotation = { _x: povRef.current.rotation._x, _y: povRef.current.rotation._y, _z: povRef.current.rotation._z };
