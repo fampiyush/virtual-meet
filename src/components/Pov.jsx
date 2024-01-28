@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
-import React, {useRef, useMemo, useContext} from 'react'
+import React, {useRef, useMemo, useContext, useEffect} from 'react'
 import useKeyboard from '../helpers/useKeyboard'
-import { sendModel } from '../helpers/socketConnection'
 import { useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, PointerLockControls } from '@react-three/drei'
 import { PlayerContext } from '../helpers/contextProvider'
+import throttle from 'lodash.throttle'
 import * as THREE from 'three'
 
 const Pov = ({socket, povRef}) => {
@@ -15,6 +15,7 @@ const Pov = ({socket, povRef}) => {
     const keyMap = useKeyboard()
 
     const onChange = () => {
+      console.log('first')
       Promise.all(peerConn.map(async (conn) => {
         const position = { x: povRef.current.position.x, y: povRef.current.position.y, z: povRef.current.position.z };
         const rotation = { _x: povRef.current.rotation._x, _y: povRef.current.rotation._y, _z: povRef.current.rotation._z };
@@ -22,6 +23,15 @@ const Pov = ({socket, povRef}) => {
       }));
     }
     
+    const throttleOnChange = useRef();
+    useEffect(() => {
+      throttleOnChange.current = throttle(onChange, 20);
+      return () => {
+        // Clear the debounced function on cleanup
+        clearTimeout(throttleOnChange.current.cancel);
+      };
+    }, []);
+
     useFrame((_, delta) => {
       keyMap['KeyA'] && (povRef.current.translateX(-delta))
       keyMap['KeyD'] && (povRef.current.translateX(delta))
@@ -29,9 +39,11 @@ const Pov = ({socket, povRef}) => {
       keyMap['KeyS'] && (povRef.current.translateZ(delta))
       povRef.current.position.y = 0.2
       if(keyMap['KeyA'] || keyMap['KeyD'] || keyMap['KeyW'] || keyMap['KeyS']) {
-        onChange()
+        throttleOnChange.current()
       }
     })
+
+
   
     return (
     <>
@@ -39,7 +51,7 @@ const Pov = ({socket, povRef}) => {
             povRef.current &&
             <>
             <PerspectiveCamera ref={povRef} position={[0, 0.2, 2]} rotation={[0,0,0]} makeDefault={true} />
-            <PointerLockControls selector='#canvas' onChange={onChange} />
+            <PointerLockControls selector='#canvas' onChange={() => throttleOnChange.current()} />
             </>
           }
       </>
