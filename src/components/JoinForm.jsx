@@ -60,6 +60,7 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        maxLength={12}
                         className='mr-2 px-2'
                     />
                 </div>

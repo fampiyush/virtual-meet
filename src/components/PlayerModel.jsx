@@ -35,8 +35,8 @@ const PlayerModel = memo((value) => {
   const PlayerName = () => {
     return (
       <Html distanceFactor={1} position={[-0.01, 0.001, 0.001]}>
-      <div className='w-52 flex items-center justify-center absolute bottom-28 -right-24'>
-        <div className='flex items-center justify-center h-10 max-w-28 px-2 mr-1 bg-gray-900 text-white rounded select-none'>
+      <div className='w-52 flex items-center justify-center absolute bottom-28 -right-[97.6px]'>
+        <div className='flex items-center justify-center h-10 px-2 mr-1 bg-gray-900 text-white rounded select-none'>
           {playerData.name}
         </div>
         <div className='flex items-center justify-center h-10 px-2 bg-gray-900 text-white rounded select-none'>
