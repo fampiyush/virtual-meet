@@ -16,13 +16,14 @@ function App() {
   const [loading, setLoading] = useState(true)
   // const [players, setPlayers] = useState(null)
 
-  const {playerKeys, setPlayerKeys, myName, setPeerConn} = useContext(PlayerContext)
+  const {playerKeys, setPlayerKeys, myName, setPeerConn, peerConn} = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [audios, setAudios] = useState({})
   const [formDone, setFormDone] = useState(false)
   const [videoStream, setVideoStream] = useState(false)
   const [audioStream, setAudioStream] = useState(false)
+  const [audioIcon, setAudioIcon] = useState({})
 
   const players = useRef(null)
   const playersRef = useRef(null)
@@ -134,6 +135,9 @@ function App() {
           track.enabled = false
         }
       })
+      Promise.all(peerConn.map(async (conn) => {
+        conn.send({ type: 'audio', audio: false, socketId: socket.current.id});
+      }));
       return
     }
 
@@ -142,6 +146,9 @@ function App() {
         if(track.kind === 'audio'){
           track.enabled = true
         }
+        Promise.all(peerConn.map(async (conn) => {
+          conn.send({ type: 'audio', audio: true, socketId: socket.current.id});
+        }));
       })
     }
 
@@ -203,7 +210,7 @@ function App() {
             if(povRef.current){
               const position = { x: povRef.current.position.x, y: povRef.current.position.y, z: povRef.current.position.z };
               const rotation = { _x: povRef.current.rotation._x, _y: povRef.current.rotation._y, _z: povRef.current.rotation._z };
-              conn.send({ position: position, rotation: rotation, socketId: socket.current.id, peerId: peer.current.id, room: room.current, name: myName });
+              conn.send({position: position, rotation: rotation, socketId: socket.current.id, peerId: peer.current.id, room: room.current, name: myName });
             }else {
               conn.send({position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
             }
@@ -212,7 +219,13 @@ function App() {
             if(!players.current){
               players.current = {[data.socketId]: data}
             }
-            updatePlayers(data)
+            if(data.type === 'audio'){
+              setAudioIcon((prev) => {
+                return {...prev, [data.socketId]: data.audio}
+              })
+            }else {
+              updatePlayers(data)
+            }
           })
         })
   }
@@ -255,9 +268,15 @@ function App() {
         })
         conn.on('data', (data) => {
           if(!players.current){
-            players.current = {[data.socketId]: data}
+            players.current = {[data.socketId]: {...data, audio: false}}
           }
-          updatePlayers(data)
+          if(data.type === 'audio'){
+            setAudioIcon((prev) => {
+              return {...prev, [data.socketId]: data.audio}
+            })
+          }else {
+            updatePlayers(data)
+          }
         })
       })
     })
@@ -266,7 +285,7 @@ function App() {
   const updatePlayers = (data) => {
       const id = data.socketId
       if(!players.current[id]){
-        players.current = {...players.current, [id]: data}
+        players.current = {...players.current, [id]: {...data, audio: false}}
       }
       setPlayerKeys((prev) => {
         const socketIds = prev.map((key) => key.socketId)
@@ -376,7 +395,8 @@ function App() {
                     getMap={getMap} 
                     video={videos ? videos[key.peerId] : null}
                     audio={audios ? audios[key.peerId] : null} 
-                    name={players.current[key.socketId].name} 
+                    name={players.current[key.socketId].name}
+                    audioIcon={audioIcon[key.socketId]} 
                     nodes={nodes} 
                     materials={materials} videos={videos}
                     placeHolder={placeHolder}

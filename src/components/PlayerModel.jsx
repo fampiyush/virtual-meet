@@ -3,6 +3,7 @@
 /* eslint-disable react/no-unknown-property */
 import React, { memo, useEffect, useMemo, Suspense, useRef } from 'react'
 import { useVideoTexture, Html } from '@react-three/drei'
+import { BsMicFill, BsMicMuteFill } from "react-icons/bs"
 
 const PlayerModel = memo((value) => {
 
@@ -23,6 +24,7 @@ const PlayerModel = memo((value) => {
       name: value.name,
       video: value.video,
       audio: value.audio,
+      audioIcon: value.audioIcon,
       nodes: value.nodes,
       materials: value.materials,
       placeHolder: value.placeHolder
@@ -33,9 +35,14 @@ const PlayerModel = memo((value) => {
   const PlayerName = () => {
     return (
       <Html distanceFactor={1} position={[-0.01, 0.001, 0.001]}>
-        <div className='flex items-center justify-center h-10 w-20 bg-gray-900 text-white rounded absolute bottom-28 -right-8 select-none'>
+      <div className='w-52 flex items-center justify-center absolute bottom-28 -right-24'>
+        <div className='flex items-center justify-center h-10 max-w-28 px-2 mr-1 bg-gray-900 text-white rounded select-none'>
           {playerData.name}
         </div>
+        <div className='flex items-center justify-center h-10 px-2 bg-gray-900 text-white rounded select-none'>
+          {playerData.audioIcon ? <BsMicFill /> : <BsMicMuteFill />}
+        </div>
+      </div>
       </Html>
     )
   }
