@@ -67,7 +67,7 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
 
     return (
         <div className="flex items-center justify-center h-screen">
-            <div className='p-2 bg-[#a6a802] rounded border-2'>
+            <div className='p-2 bg-gradient-to-r from-gray-500 via-slate-500 to-gray-500 rounded border-2'>
                 <h1 className='mb-8 text-xl text-center'>Virtual Meet</h1>
                 <div className='mb-4'>
                     <div>
