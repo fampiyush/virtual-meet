@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import JoinForm from './components/JoinForm'
 import JoinLink from './components/JoinLink'
-import MainEngine from './components/mainEngine'
+import MainEngine from './components/MainEngine'
 import { Suspense } from 'react'
 
 const App = () => {
