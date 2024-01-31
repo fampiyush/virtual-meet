@@ -1,8 +1,9 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { connectSocket } from '../helpers/socketConnection';
 import { PlayerContext } from '../helpers/contextProvider';
 
-const JoinForm = ({setFormDone, peer, socket, room}) => {
+const JoinForm = () => {
     const [meetingId, setMeetingId] = useState('');
     const [name, setName] = useState('');
     const [error, setError] = useState({
@@ -10,7 +11,9 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
         meetingMessage: '',
         name: false
     });
-    const {setMyName} = useContext(PlayerContext)
+    const {setMyName, socket, room} = useContext(PlayerContext)
+
+    const navigate = useNavigate()
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -36,10 +39,9 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
         connectSocket(lowercaseMeetingId).then((value) => {
             if(value && value.room){
                 socket.current = value.socket
-                peer.current = value.peer
                 room.current = value.room
                 setMyName([name])
-                setFormDone(true)
+                navigate(`/${value.room}`)
             }else {
                 value.socket.disconnect()
                 setError({...error, meetingId: true, meetingMessage: 'Meeting ID does not exist'})
@@ -58,10 +60,9 @@ const JoinForm = ({setFormDone, peer, socket, room}) => {
         
         connectSocket().then((value) => {
             socket.current = value.socket
-            peer.current = value.peer
             room.current = value.room
             setMyName([name])
-            setFormDone(true)
+            navigate(`/${value.room}`)
         })
     }
 

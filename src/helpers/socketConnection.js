@@ -1,5 +1,4 @@
 import { io } from "socket.io-client";
-import { Peer } from "peerjs"
 
 export const connectSocket = (room) => {
     const socket = io(import.meta.env.VITE_BACKEND_URL);
@@ -8,17 +7,7 @@ export const connectSocket = (room) => {
         socket.on("connect", () => {
             socket.emit('join', room)
             socket.on('joined-room', (room) => {
-                if(room){
-                    const peer = new Peer({
-                        host: (import.meta.env.VITE_PEER_HOST),
-                        secure: true,
-                    });
-                    peer.on('open', () => {
-                        resolve({ socket, peer, room });
-                    })
-                }else {
-                    resolve({socket, room})
-                }
+                resolve({socket, room})
             })
         });
     });

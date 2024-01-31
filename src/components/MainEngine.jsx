@@ -2,13 +2,13 @@
 import { useEffect, useRef, useState, useMemo, useContext } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, useHelper, Stats } from '@react-three/drei'
+import { Peer } from "peerjs"
 import * as THREE from 'three'
 import { connectSocket, sendModel } from '../helpers/socketConnection'
 import { PlayerContext } from '../helpers/contextProvider'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import PlayerModel from './PlayerModel'
 import Pov from './Pov'
-import JoinForm from './JoinForm'
 import BottomBar from './BottomBar'
 
 function MainEngine() {
@@ -16,11 +16,10 @@ function MainEngine() {
   const [loading, setLoading] = useState(true)
   // const [players, setPlayers] = useState(null)
 
-  const {playerKeys, setPlayerKeys, myName, setPeerConn, peerConn} = useContext(PlayerContext)
+  const {playerKeys, setPlayerKeys, myName, setPeerConn, peerConn, socket, room} = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [audios, setAudios] = useState({})
-  const [formDone, setFormDone] = useState(false)
   const [videoStream, setVideoStream] = useState(false)
   const [audioStream, setAudioStream] = useState(false)
   const [audioIcon, setAudioIcon] = useState({})
@@ -54,15 +53,18 @@ function MainEngine() {
   const placeHolder = useLoader(THREE.TextureLoader, '/placeholder.jpg')
 
   let peer = useRef(null)
-  let socket = useRef(null)
-  let room = useRef(null)
   useEffect(() => {
-    if(formDone){
+    const peerConnection = new Peer({
+      host: (import.meta.env.VITE_PEER_HOST),
+      secure: true,
+    });
+    peerConnection.on('open', () => {
+      peer.current = peerConnection  
       console.log(room.current)
       getMedia()
       setLoading(false)
-    }
-  }, [formDone])
+    })
+  }, [])
 
   useEffect(() => {
     if(!videoStream && videoStreamRef.current){
@@ -351,11 +353,6 @@ function MainEngine() {
 
   return (
     <div className='h-screen w-screen'>
-    {
-      !formDone ?
-      <JoinForm setFormDone={setFormDone} peer={peer} socket={socket} room={room} />
-      :
-      <>
         {
           !loading ?
           <>
@@ -411,8 +408,6 @@ function MainEngine() {
           </>
           :
           <h1>Loading...</h1>
-        }
-        </>
     }
     </div>
   )

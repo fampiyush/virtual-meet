@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useRef } from 'react';
 
 // Create a new context
 const PlayerContext = createContext([]);
@@ -9,8 +9,11 @@ const ContextProvider = ({ children }) => {
     const [myName, setMyName] = useState('');
     const [peerConn, setPeerConn] = useState([]);
 
+    const socket = useRef(null);
+    const room = useRef(null);
+
     return (
-        <PlayerContext.Provider value={{ playerKeys, setPlayerKeys, myName, setMyName, peerConn, setPeerConn }}>
+        <PlayerContext.Provider value={{ playerKeys, setPlayerKeys, myName, setMyName, peerConn, setPeerConn, socket, room }}>
             {children}
         </PlayerContext.Provider>
     );
