@@ -41,7 +41,7 @@ const JoinForm = () => {
                 socket.current = value.socket
                 room.current = value.room
                 setMyName([name])
-                navigate(`/${value.room}`)
+                navigate(`/${value.room}/3d`)
             }else {
                 value.socket.disconnect()
                 setError({...error, meetingId: true, meetingMessage: 'Meeting ID does not exist'})
@@ -62,7 +62,7 @@ const JoinForm = () => {
             socket.current = value.socket
             room.current = value.room
             setMyName([name])
-            navigate(`/${value.room}`)
+            navigate(`/${value.room}/3d`)
         })
     }
 

@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unknown-property */
-import { useEffect, useRef, useState, useMemo, useContext } from 'react'
+import { useEffect, useRef, useState, useMemo, useContext, Suspense } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, useHelper, Stats } from '@react-three/drei'
 import { Peer } from "peerjs"
@@ -32,6 +33,9 @@ function MainEngine() {
   const audioStreamRef = useRef(null)
   const povRef = useRef(null)
 
+  const navigate = useNavigate()
+  const { meetingId } = useParams()
+
   const getMap = () => {
     if(!playersRef.current){
       playersRef.current = new Map()
@@ -54,6 +58,10 @@ function MainEngine() {
 
   let peer = useRef(null)
   useEffect(() => {
+    if(!socket.current){
+      navigate(`/${meetingId}`)
+      return
+    }
     const peerConnection = new Peer({
       host: (import.meta.env.VITE_PEER_HOST),
       secure: true,
@@ -352,6 +360,7 @@ function MainEngine() {
   }
 
   return (
+    <Suspense fallback={<h1>Loading...</h1>}>
     <div className='h-screen w-screen'>
         {
           !loading ?
@@ -397,7 +406,7 @@ function MainEngine() {
                     nodes={nodes} 
                     materials={materials} videos={videos}
                     placeHolder={placeHolder}
-                     />
+                    />
                 )
               })
             }
@@ -410,6 +419,7 @@ function MainEngine() {
           <h1>Loading...</h1>
     }
     </div>
+    </Suspense>
   )
 }
 

@@ -1,15 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import JoinForm from './components/JoinForm'
+import JoinLink from './components/JoinLink'
 import MainEngine from './components/mainEngine'
+import { Suspense } from 'react'
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<JoinForm />} />
-        <Route path='/:code' element={<MainEngine />} />
-      </Routes>
-    </BrowserRouter>
+    <Suspense fallback={<h1>Loading...</h1>}>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<JoinForm />} />
+          <Route path='/:meetingId' element={<JoinLink />} />
+          <Route path='/:meetingId/3d' element={<MainEngine />} />
+        </Routes>
+      </BrowserRouter>
+    </Suspense>
   )
 }
 
