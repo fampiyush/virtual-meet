@@ -10,15 +10,15 @@ const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) =
     const [videoButton, setVideoButton] = useState(false)
     const [videoDisabled, setVideoDisabled] = useState(false)
 
-    const debouncedSetVideoStream = debounce(setVideoStream, 500)
+    const debouncedSetVideoStream = debounce(setVideoStream, 1000)
 
     useEffect(() => {
         const onDocumentKey = (e) => {
             if(e.ctrlKey && e.code === 'KeyC'){
-                handleAudio()
+                !globalMicButton ? handleAudio() : null
             }
             if(e.ctrlKey && e.code === 'KeyV'){
-                handleVideo()
+                !videoButton ? handleVideo() : null
             }
         }
         document.addEventListener('keydown', onDocumentKey)
@@ -28,18 +28,18 @@ const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) =
       }, [])
 
       const handleVideo = () => {
-        setVideoButton(!videoButton)
+        setVideoButton((prev) => !prev)
         setVideoDisabled(true)
 
         setTimeout(() => {
             setVideoDisabled(false)
-        }, 500)
+        }, 1000)
 
         debouncedSetVideoStream((prev) => !prev)
       }
 
       const handleAudio = () => {
-        setGlobalMicButton(!globalMicButton)
+        setGlobalMicButton((prev) => !prev)
         setAudioStream((prev) => !prev)
       }
 
@@ -48,7 +48,7 @@ const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) =
         <div className='flex min-w-[15%] justify-between bg-gray-300 px-2 rounded'>
             <div onClick={handleAudio} className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
                 {
-                    audioStream ?
+                    globalMicButton ?
                     <BsMicFill color='#5c89d1' size={40} title='Global Mic, Hold Spacebar for push to talk' />
                     :
                     <BsMicMuteFill color='#5c89d1' size={40} title='Global Mic, Hold Spacebar for push to talk' />
@@ -59,9 +59,9 @@ const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) =
                 <LuRadioTower color='#5c89d1' size={40} title='Local Mic, Only person closer to you can hear' />
                 <p className='text-xs text-[#000] select-none'>Hold T</p>
             </div>
-            <div onClick={handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-50' : ''}`}>
+            <div onClick={videoDisabled ? null : handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-50' : ''}`}>
                 {
-                    videoStream ?
+                    videoButton ?
                     <BsCameraVideoFill color='#5c89d1' size={40} title='Video will be shown as screen' />
                     :
                     <BsCameraVideoOffFill color='#5c89d1' size={40} title='Video will be shown as screen' />
