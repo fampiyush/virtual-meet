@@ -12,6 +12,7 @@ import PlayerModel from './PlayerModel'
 import Pov from './Pov'
 import BottomBar from './BottomBar'
 import { LoaderBar } from '../helpers/loaders'
+import Info from './Info'
 
 function MainEngine() {
 
@@ -384,6 +385,7 @@ function MainEngine() {
             }
           </div>
           <BottomBar setVideoStream={setVideoStream} setAudioStream={setAudioStream} videoStream={videoStream} audioStream={audioStream} />
+          <Info />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
             <Plane />
             {
@@ -413,8 +415,8 @@ function MainEngine() {
             }
             <gridHelper />
             {/* <OrbitControls /> */}
-            <Stats />
-          </Canvas>
+          </Canvas>    
+          <Stats className='flex justify-end right-0 pointer-events-none z-50' />
           </>
           :
           <LoaderBar />
