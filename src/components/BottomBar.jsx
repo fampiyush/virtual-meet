@@ -46,7 +46,7 @@ const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) =
   return (
     <div className='fixed w-[100%] bottom-2 flex text-center justify-center z-10'>
         <div className='flex min-w-[15%] justify-between bg-gray-300 px-2 rounded'>
-            <div onClick={handleAudio} className='px-1 pt-1 hover:bg-white rounded'>
+            <div onClick={handleAudio} className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
                 {
                     audioStream ?
                     <BsMicFill color='#5c89d1' size={40} title='Global Mic, Hold Spacebar for push to talk' />
@@ -55,11 +55,11 @@ const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) =
                 }
                 <p className='text-xs text-[#000] select-none'>Ctrl+C</p>
             </div>
-            <div className='px-1 pt-1 hover:bg-white rounded'>
+            <div className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
                 <LuRadioTower color='#5c89d1' size={40} title='Local Mic, Only person closer to you can hear' />
                 <p className='text-xs text-[#000] select-none'>Hold T</p>
             </div>
-            <div onClick={handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-40' : ''}`}>
+            <div onClick={handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-50' : ''}`}>
                 {
                     videoStream ?
                     <BsCameraVideoFill color='#5c89d1' size={40} title='Video will be shown as screen' />
