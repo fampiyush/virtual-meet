@@ -11,6 +11,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import PlayerModel from './PlayerModel'
 import Pov from './Pov'
 import BottomBar from './BottomBar'
+import { LoaderBar } from '../helpers/loaders'
 
 function MainEngine() {
 
@@ -360,7 +361,7 @@ function MainEngine() {
   }
 
   return (
-    <Suspense fallback={<h1>Loading...</h1>}>
+    <Suspense fallback={<LoaderBar />}>
     <div className='h-screen w-screen'>
         {
           !loading ?
@@ -416,7 +417,7 @@ function MainEngine() {
           </Canvas>
           </>
           :
-          <h1>Loading...</h1>
+          <LoaderBar />
     }
     </div>
     </Suspense>

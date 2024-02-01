@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { connectSocket } from '../helpers/socketConnection';
 import { PlayerContext } from '../helpers/contextProvider';
+import { LoaderSync } from '../helpers/loaders';
 
 const JoinForm = () => {
     const [meetingId, setMeetingId] = useState('');
@@ -11,6 +12,7 @@ const JoinForm = () => {
         meetingMessage: '',
         name: false
     });
+    const [loading, setLoading] = useState(false)
     const {setMyName, socket, room} = useContext(PlayerContext)
 
     const navigate = useNavigate()
@@ -35,14 +37,17 @@ const JoinForm = () => {
             setError({...error, meetingId: false, meetingMessage: ''})
         }
         
+        setLoading(true)
         const lowercaseMeetingId = meetingId.toLowerCase(); // Convert meeting ID to lowercase
         connectSocket(lowercaseMeetingId).then((value) => {
             if(value && value.room){
                 socket.current = value.socket
                 room.current = value.room
                 setMyName([name])
+                setLoading(false)
                 navigate(`/${value.room}/3d`)
             }else {
+                setLoading(false)
                 value.socket.disconnect()
                 setError({...error, meetingId: true, meetingMessage: 'Meeting ID does not exist'})
             }
@@ -58,16 +63,23 @@ const JoinForm = () => {
             return
         }
         
+        setLoading(true)
         connectSocket().then((value) => {
             socket.current = value.socket
             room.current = value.room
             setMyName([name])
+            setLoading(false)
             navigate(`/${value.room}/3d`)
         })
     }
 
     return (
         <div className="flex items-center justify-center h-screen">
+            {
+                loading && (
+                    <LoaderSync />
+                )
+            }
             <div className='p-2 bg-gradient-to-r from-gray-500 via-slate-500 to-gray-500 rounded border-2'>
                 <h1 className='mb-8 text-xl text-center'>Virtual Meet</h1>
                 <div className='mb-4'>

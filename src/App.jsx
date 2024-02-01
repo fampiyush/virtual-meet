@@ -2,11 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import JoinForm from './components/JoinForm'
 import JoinLink from './components/JoinLink'
 import MainEngine from './components/MainEngine'
+import { LoaderBar } from './helpers/loaders'
 import { Suspense } from 'react'
 
 const App = () => {
   return (
-    <Suspense fallback={<h1>Loading...</h1>}>
+    <Suspense fallback={<LoaderBar />}>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<JoinForm />} />
