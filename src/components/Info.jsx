@@ -50,14 +50,14 @@ const Info = () => {
                 <div className='grid grid-rows-4 grid-cols-2 mt-4 gap-2'>
                     <div className='max-w-[fit-content]'>Meeting Id: </div>
                     <div className='flex'>
-                        <span className='bg-[#575857] rounded px-1 mr-1'>dfg5464</span>
+                        <span className='bg-[#575857] rounded px-1 mr-1'>{meetingId}</span>
                         <button className='mt-[0.05rem] active:opacity-50' onClick={copyId}>
                             <MdOutlineContentCopy size={20} color='#fff' />
                         </button>
                     </div>
                     <div className='max-w-[fit-content]'>Meeting Link:</div>
                     <div className='row-span-3 break-words'>
-                        <span>https://virtualmeet.com/dfg546</span>
+                        <span>{baseUrl}{meetingId}</span>
                         <button className='text-sm flex text-center mt-2 max-w-[fit-content] bg-[#dfdcdc] rounded px-1 active:opacity-50' onClick={copyLink}>
                             <span className='mr-1 text-[#0000EE]'>Copy Link</span>
                             <span className='mt-[0.2rem]'>
