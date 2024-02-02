@@ -62,7 +62,7 @@ const Info = () => {
                     </button>
                 </div>
                 <h1 className='text-lg'>Virtual Meet</h1>
-                <div className='grid grid-rows-3 grid-cols-2 mt-4 gap-2'>
+                <div className='grid grid-rows-4 grid-cols-2 mt-4 gap-2'>
                     <div className='max-w-[fit-content]'>Meeting Id: </div>
                     <div className='flex'>
                         <div className='flex bg-[#575857] p-1 rounded max-w-[fit-content]'>
@@ -76,7 +76,7 @@ const Info = () => {
                         </div>
                     </div>
                     <div className='max-w-[fit-content]'>Meeting Link:</div>
-                    <div className='row-span-2 break-words'>
+                    <div className='row-span-3 break-words'>
                         <span>{baseUrl}{meetingId}</span>
                         <div className='flex'>
                             <button className='text-sm flex text-center mt-2 max-w-[fit-content] bg-[#dfdcdc] rounded px-1 active:opacity-50' onClick={copyLink}>
