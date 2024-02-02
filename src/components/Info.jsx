@@ -3,10 +3,13 @@ import { useParams } from 'react-router-dom'
 import { IoMdInformationCircleOutline } from "react-icons/io"
 import { MdOutlineContentCopy, MdLock } from "react-icons/md"
 import { IoClose } from "react-icons/io5"
+import { FaCheck } from "react-icons/fa6"
 
 const Info = () => {
 
     const [showModal, setShowModal] = useState(false)
+    const [checkId, setCheckId] = useState(false)
+    const [checkLink, setCheckLink] = useState(false)
 
     const { meetingId } = useParams()
 
@@ -16,17 +19,29 @@ const Info = () => {
         setShowModal(true)
     }
 
+    let timeoutLink
     const copyLink = async() => {
+        clearTimeout(timeoutLink)
         try {
             await navigator.clipboard.writeText(`${baseUrl}${meetingId}`)
+            setCheckLink(true)
+            timeoutLink = setTimeout(() => {
+                setCheckLink(false)
+            }, 2000)
         } catch (error) {
             alert('Failed to copy link')
         }
     }
 
+    let timeoutId
     const copyId = async() => {
+        clearTimeout(timeoutId)
         try {
             await navigator.clipboard.writeText(meetingId)
+            setCheckId(true)
+            timeoutId = setTimeout(() => {
+                setCheckId(false)
+            }, 2000)
         } catch (error) {
             alert('Failed to copy link')
         }
@@ -49,21 +64,31 @@ const Info = () => {
                 <h1 className='text-lg'>Virtual Meet</h1>
                 <div className='grid grid-rows-3 grid-cols-2 mt-4 gap-2'>
                     <div className='max-w-[fit-content]'>Meeting Id: </div>
-                    <div className='flex bg-[#575857] max-w-[fit-content] p-1 rounded'>
-                        <span className='rounded px-1 mr-1'>{meetingId}</span>
-                        <button className='mt-[0.05rem] active:opacity-50' onClick={copyId}>
-                            <MdOutlineContentCopy size={20} color='#fff' />
-                        </button>
+                    <div className='flex'>
+                        <div className='flex bg-[#575857] p-1 rounded max-w-[fit-content]'>
+                            <span className='rounded px-1 mr-1'>{meetingId}</span>
+                            <button className='mt-[0.05rem] active:opacity-50' onClick={copyId}>
+                                <MdOutlineContentCopy size={20} color='#fff' />
+                            </button>
+                        </div>
+                        <div className={`ml-1 mt-2 ${checkId ? '' : 'hidden'}`}>
+                            <FaCheck color='#39fa73' />
+                        </div>
                     </div>
                     <div className='max-w-[fit-content]'>Meeting Link:</div>
                     <div className='row-span-2 break-words'>
                         <span>{baseUrl}{meetingId}</span>
-                        <button className='text-sm flex text-center mt-2 max-w-[fit-content] bg-[#dfdcdc] rounded px-1 active:opacity-50' onClick={copyLink}>
-                            <span className='mr-1 text-[#0000EE]'>Copy Link</span>
-                            <span className='mt-[0.2rem]'>
-                                <MdOutlineContentCopy color='#0000EE' />
-                            </span>
-                        </button>
+                        <div className='flex'>
+                            <button className='text-sm flex text-center mt-2 max-w-[fit-content] bg-[#dfdcdc] rounded px-1 active:opacity-50' onClick={copyLink}>
+                                <span className='mr-1 text-[#0000EE]'>Copy Link</span>
+                                <span className='mt-[0.2rem]'>
+                                    <MdOutlineContentCopy color='#0000EE' />
+                                </span>
+                            </button>
+                            <div className={`ml-1 mt-2 ${checkLink ? '' : 'hidden'}`}>
+                                <FaCheck color='#39fa73' />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className='text-xs mt-4 flex justify-center text-center'>
