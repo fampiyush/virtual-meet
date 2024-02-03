@@ -95,7 +95,6 @@ function MainEngine() {
     }
     const getMediaStream = () => {
         const getUserMedia = navigator.mediaDevices.getUserMedia
-        console.log('video', navigator.mediaDevices.getUserMedia({video: true, audio: false}))
         getUserMedia({
           video: {
             width: {max: 640},
@@ -103,6 +102,7 @@ function MainEngine() {
           },
           audio: false
         }).then(stream => {
+          console.log(stream)
           videoStreamRef.current = stream
           playerKeys.forEach((key) => {
             connectToNewUser(key.peerId, stream)
@@ -122,12 +122,12 @@ function MainEngine() {
   },[videoStream])
 
   const getMediaStreamAudio = (keys) => {
-    console.log('audio', navigator.mediaDevices.getUserMedia({video: false, audio: true}))
       const getUserMedia = navigator.mediaDevices.getUserMedia
       getUserMedia({
         video: false,
         audio: true
       }).then(stream => {
+        console.log(stream)
         stream.getTracks().forEach((track) => {
           if(track.kind === 'audio'){
             track.enabled = false
