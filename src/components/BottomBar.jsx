@@ -32,9 +32,9 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
         }
     }, [audioDisabled, videoDisabled])
 
-    useEffect(() => {
-        getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer, true)
-    },[])
+    // useEffect(() => {
+    //     getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer, true)
+    // },[])
 
     const handleVideo = () => {
         setVideoButton((prev) => !prev)
@@ -57,8 +57,8 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
     }
 
     const handleAudio = () => {
-        setGlobalMicButton((prev) => !prev)
         if(audioStreamRef.current){
+            setGlobalMicButton((prev) => !prev)
             audioStreamRef.current.getTracks().forEach((track) => {
                 if(track.kind === 'audio'){
                 track.enabled = !track.enabled
@@ -73,6 +73,7 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
         if(!audioStreamRef.current){
             setAudioDisabled(true)
             setTimeout(() => {
+                setGlobalMicButton((prev) => !prev)
                 setAudioDisabled(false)
             }, 1000)
             getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer)
