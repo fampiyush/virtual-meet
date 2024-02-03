@@ -1,12 +1,13 @@
 /* eslint-disable react/no-unknown-property */
-import { useEffect, useRef, useState, useMemo, useContext, Suspense } from 'react'
+import { useEffect, useRef, useState, useContext, Suspense } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { OrbitControls, useHelper, Stats } from '@react-three/drei'
+import { Stats } from '@react-three/drei'
 import { Peer } from "peerjs"
 import * as THREE from 'three'
-import { connectSocket, sendModel } from '../helpers/socketConnection'
+import { sendModel } from '../helpers/socketConnection'
 import { PlayerContext } from '../helpers/contextProvider'
+import { connectToNewUser } from '../helpers/getMedia'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import PlayerModel from './PlayerModel'
 import Pov from './Pov'
@@ -17,19 +18,14 @@ import Info from './Info'
 function MainEngine() {
 
   const [loading, setLoading] = useState(true)
-  // const [players, setPlayers] = useState(null)
-
-  const {playerKeys, setPlayerKeys, myName, setPeerConn, peerConn, socket, room} = useContext(PlayerContext)
+  const {playerKeys, setPlayerKeys, myName, setPeerConn, socket, peer, room} = useContext(PlayerContext)
   const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [audios, setAudios] = useState({})
-  const [videoStream, setVideoStream] = useState(false)
-  const [audioStream, setAudioStream] = useState(false)
   const [audioIcon, setAudioIcon] = useState({})
 
   const players = useRef(null)
   const playersRef = useRef(null)
-  // const videos = useRef(null)
   const videoRef = useRef(null)
   const videoStreamRef = useRef(null)
   const audioStreamRef = useRef(null)
@@ -52,13 +48,11 @@ function MainEngine() {
     return videoRef.current
   }
   
-
   const {nodes, materials} = useLoader(GLTFLoader, '/television.glb');
   materials['Scene_-_Root'].color = new THREE.Color('grey');
 
   const placeHolder = useLoader(THREE.TextureLoader, '/placeholder.jpg')
 
-  let peer = useRef(null)
   useEffect(() => {
     if(!socket.current){
       navigate(`/${meetingId}`)
@@ -81,102 +75,6 @@ function MainEngine() {
       navigate('/')
     }
   }, [])
-
-  useEffect(() => {
-    if(!videoStream && videoStreamRef.current){
-      videoStreamRef.current.getTracks().forEach((track) => {
-        if(track.kind === 'video'){
-          track.stop()
-        }
-      })
-      return
-    }else if(!videoStream && !videoStreamRef.current){
-      return
-    }
-    const getMediaStream = () => {
-        const getUserMedia = navigator.mediaDevices.getUserMedia
-        getUserMedia({
-          video: {
-            width: {max: 640},
-            height: {max: 480}
-          },
-          audio: false
-        }).then(stream => {
-          console.log(stream)
-          videoStreamRef.current = stream
-          playerKeys.forEach((key) => {
-            connectToNewUser(key.peerId, stream)
-          })
-        })
-        .catch(err => {
-          if(err.message === 'Permission denied'){
-            alert('Please allow camera access to use the video camera')
-          }
-          if(err.message === 'Device in use'){
-            alert('Camera is already in use, please close all other apps using the camera')
-          }
-          setVideoStream(false)
-        })
-    }
-    getMediaStream()
-  },[videoStream])
-
-  const getMediaStreamAudio = (keys) => {
-      const getUserMedia = navigator.mediaDevices.getUserMedia
-      getUserMedia({
-        video: false,
-        audio: true
-      }).then(stream => {
-        console.log(stream)
-        stream.getTracks().forEach((track) => {
-          if(track.kind === 'audio'){
-            track.enabled = false
-          }
-        })
-        audioStreamRef.current = stream
-        keys.forEach((key) => {
-          connectToNewUser(key.peerId, stream)
-        })
-      })
-      .catch(err => {
-        if(err.message === 'Permission denied'){
-          alert('Please allow microphone access to use the global mic')
-        }
-        if(err.message === 'Device in use'){
-          alert('Microphone is already in use, please close all other apps using the microphone')
-        }
-        setAudioStream(false)
-      })
-  }
-  useEffect(() => {
-    if(!audioStream && audioStreamRef.current){
-      audioStreamRef.current.getTracks().forEach((track) => {
-        if(track.kind === 'audio'){
-          track.enabled = false
-        }
-      })
-      Promise.all(peerConn.map(async (conn) => {
-        conn.send({ type: 'audio', audio: false, socketId: socket.current.id});
-      }));
-      return
-    }
-
-    if(audioStream && audioStreamRef.current){
-      audioStreamRef.current.getTracks().forEach((track) => {
-        if(track.kind === 'audio'){
-          track.enabled = true
-        }
-        Promise.all(peerConn.map(async (conn) => {
-          conn.send({ type: 'audio', audio: true, socketId: socket.current.id});
-        }));
-      })
-    }
-
-    if(audioStream && !audioStreamRef.current){
-      getMediaStreamAudio(playerKeys)
-    }
-  },[audioStream])
-
 
   const Plane = () => {
     return (
@@ -221,7 +119,6 @@ function MainEngine() {
         sendModel(socket.current, {peerId: peer.current.id, room: room.current, name: myName})
         getPlayers()
         onDisconnect()
-        // setVideos({[peer.current.id]: stream})
         setVideosComponent([peer.current.id])
 
         peer.current.on('connection', (conn) => {
@@ -276,9 +173,7 @@ function MainEngine() {
   const getPlayers = () => {
     socket.current.emit('get-all-users')
     socket.current.on('all-users', (player) => {
-      // players.current = player
       const keys = Object.entries(player).map(([key, value]) => ({ socketId: key, peerId: value.peerId }))
-      getMediaStreamAudio(keys)
 
       keys.forEach((key) => {
         const conn = peer.current.connect(key.peerId)
@@ -311,10 +206,10 @@ function MainEngine() {
         const socketIds = prev.map((key) => key.socketId)
         if(!socketIds.includes(id)){
           if(audioStreamRef.current){
-            connectToNewUser(data.peerId, audioStreamRef.current)
+            connectToNewUser(data.peerId, audioStreamRef.current, peer)
           }
           if(videoStreamRef.current){
-            connectToNewUser(data.peerId, videoStreamRef.current)
+            connectToNewUser(data.peerId, videoStreamRef.current, peer)
           }
           return [...prev, {socketId: id, peerId: data.peerId}]
         }else {
@@ -363,12 +258,6 @@ function MainEngine() {
       }) 
   }
 
-  const connectToNewUser = (id, stream) => {
-    const call = peer.current.call(id, stream)
-      
-    console.log('calling', id)
-  }
-
   return (
     <Suspense fallback={<LoaderBar />}>
     <div className='h-screen w-screen'>
@@ -392,7 +281,7 @@ function MainEngine() {
               })
             }
           </div>
-          <BottomBar setVideoStream={setVideoStream} setAudioStream={setAudioStream} videoStream={videoStream} audioStream={audioStream} />
+          <BottomBar audioStreamRef={audioStreamRef} videoStreamRef={videoStreamRef} />
           <Info />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
             <Plane />

@@ -1,52 +1,84 @@
-import React, { useState, useEffect, useRef } from 'react'
-import debounce from 'lodash.debounce'
+/* eslint-disable react/prop-types */
+import React, { useState, useEffect, useContext } from 'react'
 import { BsMicFill, BsMicMuteFill, BsCameraVideoFill, BsCameraVideoOffFill } from "react-icons/bs"
 import { LuRadioTower } from "react-icons/lu"
+import { PlayerContext } from '../helpers/contextProvider'
+import { getMediaStreamAudio, getMediaStreamVideo } from '../helpers/getMedia'
 
-const BottomBar = ({setVideoStream, setAudioStream, videoStream, audioStream}) => {
+const BottomBar = ({audioStreamRef, videoStreamRef}) => {
 
     const [globalMicButton, setGlobalMicButton] = useState(false)
     const [localMic, setLocalMic] = useState(false)
     const [videoButton, setVideoButton] = useState(false)
     const [videoDisabled, setVideoDisabled] = useState(false)
+    const [audioDisabled, setAudioDisabled] = useState(false)
 
-    const debouncedSetVideoStream = debounce(setVideoStream, 1000)
+    const { peerConn, socket, peer, playerKeys } = useContext(PlayerContext)
+
+    // const debouncedSetVideoStream = debounce(setVideoStream, 1000)
 
     useEffect(() => {
         const onDocumentKey = (e) => {
             if(e.ctrlKey && e.code === 'KeyC'){
-                !globalMicButton ? handleAudio() : null
+                !audioDisabled ? handleAudio() : null
             }
             if(e.ctrlKey && e.code === 'KeyV'){
-                !videoButton ? handleVideo() : null
+                !videoDisabled ? handleVideo() : null
             }
         }
         document.addEventListener('keydown', onDocumentKey)
         return () => {
           document.removeEventListener('keydown', onDocumentKey)
         }
-      }, [])
+      }, [audioDisabled, videoDisabled])
 
-      const handleVideo = () => {
+    const handleVideo = () => {
         setVideoButton((prev) => !prev)
         setVideoDisabled(true)
-
         setTimeout(() => {
             setVideoDisabled(false)
         }, 1000)
 
-        debouncedSetVideoStream((prev) => !prev)
-      }
+        if(videoStreamRef.current){
+            videoStreamRef.current.getTracks().forEach((track) => {
+                if(track.kind === 'video'){
+                    track.stop()
+                }
+            })
+            videoStreamRef.current = null
+            return
+        }else if(!videoStreamRef.current){
+            getMediaStreamVideo(videoStreamRef, playerKeys, peer)
+        }
+    }
 
-      const handleAudio = () => {
+    const handleAudio = () => {
         setGlobalMicButton((prev) => !prev)
-        setAudioStream((prev) => !prev)
-      }
+        if(audioStreamRef.current){
+            audioStreamRef.current.getTracks().forEach((track) => {
+                if(track.kind === 'audio'){
+                track.enabled = !track.enabled
+                }
+                Promise.all(peerConn.map(async (conn) => {
+                    conn.send({ type: 'audio', audio: track.enabled, socketId: socket.current.id});
+                }));
+            })
+        return
+        }
+
+        if(!audioStreamRef.current){
+            setAudioDisabled(true)
+            setTimeout(() => {
+                setAudioDisabled(false)
+            }, 1000)
+            getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer)
+        }
+    }
 
   return (
     <div className='fixed w-[100%] bottom-2 flex text-center justify-center z-10'>
         <div className='flex min-w-[15%] justify-between bg-gray-300 px-2 rounded'>
-            <div onClick={handleAudio} className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
+            <div onClick={handleAudio} className={`px-1 pt-1 hover:bg-white rounded ${audioDisabled ? 'disabled opacity-50' : ''}`}>
                 {
                     globalMicButton ?
                     <BsMicFill color='#5c89d1' size={40} title='Global Mic, Hold Spacebar for push to talk' />
