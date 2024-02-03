@@ -64,16 +64,22 @@ function MainEngine() {
       navigate(`/${meetingId}`)
       return
     }
-    const peerConnection = new Peer({
-      host: (import.meta.env.VITE_PEER_HOST),
-      secure: true,
-    });
-    peerConnection.on('open', () => {
-      peer.current = peerConnection  
-      console.log(room.current)
-      getMedia()
-      setLoading(false)
-    })
+    try {
+      const peerConnection = new Peer({
+        host: (import.meta.env.VITE_PEER_HOST),
+        secure: true,
+      });
+      peerConnection.on('open', () => {
+        peer.current = peerConnection  
+        console.log(room.current)
+        getMedia()
+        setLoading(false)
+      })
+    } catch (error) {
+      console.error('Error initializing Peer:', error);
+      alert('Server Error, please try again later')
+      navigate('/')
+    }
   }, [])
 
   useEffect(() => {
