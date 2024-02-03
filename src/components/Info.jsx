@@ -77,7 +77,7 @@ const Info = () => {
                     </div>
                     <div className='max-w-[fit-content]'>Meeting Link:</div>
                     <div className='row-span-3 break-words'>
-                        <span>{baseUrl}{meetingId}</span>
+                        <span className='text-sm'>{baseUrl}{meetingId}</span>
                         <div className='flex'>
                             <button className='text-sm flex text-center mt-2 max-w-[fit-content] bg-[#dfdcdc] rounded px-1 active:opacity-50' onClick={copyLink}>
                                 <span className='mr-1 text-[#0000EE]'>Copy Link</span>
