@@ -66,7 +66,7 @@ const JoinLink = () => {
                                 setError(false)
                             }}
                             maxLength={12}
-                            className='mr-2 px-2 mb-1'
+                            className='mr-2 px-2 mb-1 bg-[#3b3b3b] text-white rounded'
                         />
                         {
                             error && <p className='text-[red] text-sm'>Please enter a username</p>
