@@ -22,7 +22,7 @@ export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
     })
 }
 
-export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket, peer) => {
+export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket, peer, first) => {
     navigator.mediaDevices.getUserMedia({
       video: false,
       audio: true
@@ -31,9 +31,19 @@ export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket
       playerKeys.forEach((key) => {
         connectToNewUser(key.peerId, stream, peer)
       })
-    Promise.all(peerConn.map(async (conn) => {
-        conn.send({ type: 'audio', audio: true, socketId: socket.current.id});
-    }));
+      !first ?
+      Promise.all(peerConn.map(async (conn) => {
+          conn.send({ type: 'audio', audio: true, socketId: socket.current.id});
+      }))
+      :
+      audioStreamRef.current.getTracks().forEach((track) => {
+        if(track.kind === 'audio'){
+          track.enabled = false
+          Promise.all(peerConn.map(async (conn) => {
+              conn.send({ type: 'audio', audio: false, socketId: socket.current.id});
+          }));
+        }
+      })
     })
     .catch(err => {
       if(err.message === 'Permission denied'){

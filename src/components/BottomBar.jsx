@@ -30,7 +30,11 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
         return () => {
           document.removeEventListener('keydown', onDocumentKey)
         }
-      }, [audioDisabled, videoDisabled])
+    }, [audioDisabled, videoDisabled])
+
+    useEffect(() => {
+        getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer, true)
+    },[])
 
     const handleVideo = () => {
         setVideoButton((prev) => !prev)
