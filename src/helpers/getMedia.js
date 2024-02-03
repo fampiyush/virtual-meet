@@ -7,19 +7,19 @@ export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
       },
       audio: false
     }).then(stream => {
-      console.log(stream)
       videoStreamRef.current = stream
       playerKeys.forEach((key) => {
         connectToNewUser(key.peerId, stream, peer)
       })
     })
     .catch(err => {
-      if(err.message === 'Permission denied'){
-        alert('Please allow camera access to use the video camera')
-      }
-      if(err.message === 'Device in use'){
-        alert('Camera is already in use, please close all other apps using the camera')
-      }
+        if(err.message === 'Permission denied'){
+            alert('Please allow camera access to use the video camera')
+        }
+        if(err.message === 'Device in use'){
+            alert('Camera is already in use, please close all other apps using the camera')
+        }
+        console.log(err)
     })
 }
 
@@ -29,7 +29,6 @@ export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket
       video: false,
       audio: true
     }).then(stream => {
-      console.log(stream)
       audioStreamRef.current = stream
       playerKeys.forEach((key) => {
         connectToNewUser(key.peerId, stream, peer)
@@ -45,6 +44,7 @@ export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket
       if(err.message === 'Device in use'){
         alert('Microphone is already in use, please close all other apps using the microphone')
       }
+      console.log(err)
     })
 }
 
