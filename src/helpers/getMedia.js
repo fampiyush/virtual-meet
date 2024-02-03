@@ -1,6 +1,5 @@
 export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
-    const getUserMedia = navigator.mediaDevices.getUserMedia
-    getUserMedia({
+    navigator.mediaDevices.getUserMedia({
       video: {
         width: {max: 640},
         height: {max: 480}
@@ -24,8 +23,7 @@ export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
 }
 
 export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket, peer) => {
-    const getUserMedia = navigator.mediaDevices.getUserMedia
-    getUserMedia({
+    navigator.mediaDevices.getUserMedia({
       video: false,
       audio: true
     }).then(stream => {

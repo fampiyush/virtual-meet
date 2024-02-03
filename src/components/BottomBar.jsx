@@ -53,8 +53,6 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
     }
 
     const handleAudio = () => {
-        const getUserMedia = navigator.mediaDevices.getUserMedia
-        console.log(getUserMedia({audio: true}))
         setGlobalMicButton((prev) => !prev)
         if(audioStreamRef.current){
             audioStreamRef.current.getTracks().forEach((track) => {
