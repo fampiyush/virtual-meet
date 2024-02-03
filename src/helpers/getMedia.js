@@ -47,7 +47,7 @@ export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket
     })
     .catch(err => {
       if(err.message === 'Permission denied'){
-        alert('Please allow microphone access to use the global mic')
+        alert('Please allow microphone access to use the global/local mic')
       }
       if(err.message === 'Device in use'){
         alert('Microphone is already in use, please close all other apps using the microphone')
