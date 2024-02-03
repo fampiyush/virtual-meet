@@ -95,6 +95,7 @@ function MainEngine() {
     }
     const getMediaStream = () => {
         const getUserMedia = navigator.mediaDevices.getUserMedia
+        console.log('video', navigator.mediaDevices)
         getUserMedia({
           video: {
             width: {max: 640},
@@ -121,6 +122,7 @@ function MainEngine() {
   },[videoStream])
 
   const getMediaStreamAudio = (keys) => {
+    console.log('audio', navigator.mediaDevices)
       const getUserMedia = navigator.mediaDevices.getUserMedia
       getUserMedia({
         video: false,
