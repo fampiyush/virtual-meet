@@ -65,7 +65,7 @@ function MainEngine() {
       });
       peerConnection.on('open', () => {
         peer.current = peerConnection  
-        console.log(room.current)
+        // console.log(room.current)
         getMedia()
         setLoading(false)
       })
@@ -89,7 +89,7 @@ function MainEngine() {
       peer.current.on('call', call => {
         call.answer()
         call.on('stream', userStream => {
-          console.log('receiving from', call.peer)
+          // console.log('receiving from', call.peer)
           const type = userStream.getTracks()[0]
           if(type.kind === 'video'){
             if(!videos[call.peer]){
@@ -115,7 +115,7 @@ function MainEngine() {
           }
         })
       })
-        console.log('Me', peer.current.id)
+        // console.log('Me', peer.current.id)
         sendModel(socket.current, {peerId: peer.current.id, room: room.current, name: myName})
         getPlayers()
         onDisconnect()

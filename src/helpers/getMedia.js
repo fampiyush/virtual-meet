@@ -69,5 +69,5 @@ export const getMediaStreamAudio = async(audioStreamRef, playerKeys, peerConn, s
 export const connectToNewUser = (id, stream, peer) => {
     const call = peer.current.call(id, stream)
         
-    console.log('calling', id)
+    // console.log('calling', id)
 }
