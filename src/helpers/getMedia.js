@@ -1,4 +1,5 @@
 export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
+    const promise = new Promise((resolve) => {
     navigator.mediaDevices.getUserMedia({
       video: {
         width: {max: 640},
@@ -10,20 +11,25 @@ export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
       playerKeys.forEach((key) => {
         connectToNewUser(key.peerId, stream, peer)
       })
+      resolve(true)
     })
     .catch(err => {
         if(err.message === 'Permission denied'){
-            alert('Please allow camera access to use the video camera')
+            alert('Please allow camera access from browser to use the video camera')
         }
         if(err.message === 'Device in use'){
             alert('Camera is already in use, please close all other apps using the camera')
         }
         console.log(err)
+        resolve(false)
     })
+  })
+  return promise
 }
 
-export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket, peer, first) => {
-    navigator.mediaDevices.getUserMedia({
+export const getMediaStreamAudio = async(audioStreamRef, playerKeys, peerConn, socket, peer, first) => {
+  const promise = new Promise((resolve) => {  
+  navigator.mediaDevices.getUserMedia({
       video: false,
       audio: true
     }).then(stream => {
@@ -44,16 +50,20 @@ export const getMediaStreamAudio = (audioStreamRef, playerKeys, peerConn, socket
           }));
         }
       })
+      resolve(true)
     })
     .catch(err => {
       if(err.message === 'Permission denied'){
-        alert('Please allow microphone access to use the global/local mic')
+        alert('Please allow microphone access from browser to use the global/local mic')
       }
       if(err.message === 'Device in use'){
         alert('Microphone is already in use, please close all other apps using the microphone')
       }
       console.log(err)
+      resolve(false)
     })
+  })
+  return promise
 }
 
 export const connectToNewUser = (id, stream, peer) => {

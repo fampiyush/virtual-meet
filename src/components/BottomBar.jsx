@@ -12,6 +12,7 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
     const [videoButton, setVideoButton] = useState(false)
     const [videoDisabled, setVideoDisabled] = useState(false)
     const [audioDisabled, setAudioDisabled] = useState(false)
+    const [audioConnecting, setAudioConnecting] = useState(false)
 
     const { peerConn, socket, peer, playerKeys } = useContext(PlayerContext)
 
@@ -37,13 +38,13 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
     // },[])
 
     const handleVideo = () => {
-        setVideoButton((prev) => !prev)
         setVideoDisabled(true)
         setTimeout(() => {
             setVideoDisabled(false)
         }, 1000)
 
         if(videoStreamRef.current){
+            setVideoButton(false)
             videoStreamRef.current.getTracks().forEach((track) => {
                 if(track.kind === 'video'){
                     track.stop()
@@ -53,10 +54,17 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
             return
         }else if(!videoStreamRef.current){
             getMediaStreamVideo(videoStreamRef, playerKeys, peer)
+            .then((done) => {
+                if(done){
+                    setVideoButton(true)
+                }else {
+                    setVideoButton(false)
+                }
+            })
         }
     }
 
-    const handleAudio = () => {
+    const handleAudio = async() => {
         if(audioStreamRef.current){
             setGlobalMicButton((prev) => !prev)
             audioStreamRef.current.getTracks().forEach((track) => {
@@ -71,42 +79,57 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
         }
 
         if(!audioStreamRef.current){
+            setAudioConnecting(true)
             setAudioDisabled(true)
-            setTimeout(() => {
-                setGlobalMicButton((prev) => !prev)
-                setAudioDisabled(false)
-            }, 1000)
             getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer)
+            .then((done) => {
+                if(done){
+                    setGlobalMicButton(true)
+                }else {
+                    setGlobalMicButton(false)
+                }
+                setAudioDisabled(false)
+                setTimeout(() => {
+                    setAudioConnecting(false)
+                }, 500)
+            })
         }
     }
 
   return (
-    <div className='fixed w-[100%] bottom-2 flex text-center justify-center z-10'>
-        <div className='flex min-w-[15%] justify-between bg-gray-300 px-2 rounded'>
-            <div onClick={handleAudio} className={`px-1 pt-1 hover:bg-white rounded ${audioDisabled ? 'disabled opacity-50' : ''}`}>
-                {
-                    globalMicButton ?
-                    <BsMicFill color='#5c89d1' size={40} title='Global Mic, Hold Spacebar for push to talk' />
-                    :
-                    <BsMicMuteFill color='#5c89d1' size={40} title='Global Mic, Hold Spacebar for push to talk' />
-                }
-                <p className='text-xs text-[#000] select-none'>Ctrl+C</p>
+    <>
+        <div className='fixed w-[100%] bottom-2 flex text-center justify-center z-10'>
+            <div className='flex min-w-[15%] justify-between bg-gray-300 px-2 rounded'>
+                <div onClick={handleAudio} className={`px-1 pt-1 hover:bg-white rounded ${audioDisabled ? 'disabled opacity-50' : ''}`}>
+                    {
+                        globalMicButton ?
+                        <BsMicFill color='#5c89d1' size={40} title='Global Mic, Everyone can hear you' />
+                        :
+                        <BsMicMuteFill color='#5c89d1' size={40} title='Global Mic, Everyone can hear you' />
+                    }
+                    <p className='text-xs text-[#000] select-none'>Ctrl+C</p>
+                </div>
+                <div className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
+                    <LuRadioTower color='#5c89d1' size={40} title='Local Mic, Only person closer to you can hear' />
+                    <p className='text-xs text-[#000] select-none'>Hold T</p>
+                </div>
+                <div onClick={videoDisabled ? null : handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-50' : ''}`}>
+                    {
+                        videoButton ?
+                        <BsCameraVideoFill color='#5c89d1' size={40} title='Video will be shown as screen' />
+                        :
+                        <BsCameraVideoOffFill color='#5c89d1' size={40} title='Video will be shown as screen' />
+                    }
+                    <p className='text-xs text-[#000] select-none'>Ctrl+V</p>
+                </div>    
             </div>
-            <div className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
-                <LuRadioTower color='#5c89d1' size={40} title='Local Mic, Only person closer to you can hear' />
-                <p className='text-xs text-[#000] select-none'>Hold T</p>
-            </div>
-            <div onClick={videoDisabled ? null : handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-50' : ''}`}>
-                {
-                    videoButton ?
-                    <BsCameraVideoFill color='#5c89d1' size={40} title='Video will be shown as screen' />
-                    :
-                    <BsCameraVideoOffFill color='#5c89d1' size={40} title='Video will be shown as screen' />
-                }
-                <p className='text-xs text-[#000] select-none'>Ctrl+V</p>
-            </div>    
         </div>
-    </div>
+        <div className={`fixed w-[100%] top-2 flex justify-center text-center z-10 ${audioConnecting ? '' : 'hidden'}`}>
+                <div className='bg-[#5c89d1] rounded p-1'>
+                    <p className='text-white text-sm'>Connecting Audio...</p>
+                </div>
+        </div>
+    </>
   )
 }
 
