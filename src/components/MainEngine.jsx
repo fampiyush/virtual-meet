@@ -19,7 +19,6 @@ function MainEngine() {
 
   const [loading, setLoading] = useState(true)
   const {playerKeys, setPlayerKeys, myName, setPeerConn, socket, peer, room} = useContext(PlayerContext)
-  const [videosComponent, setVideosComponent] = useState([])
   const [videos, setVideos] = useState({})
   const [audios, setAudios] = useState({})
   const [audioIcon, setAudioIcon] = useState({})
@@ -39,13 +38,6 @@ function MainEngine() {
       playersRef.current = new Map()
     }
     return playersRef.current
-  }
-
-  const getVideo = () => {
-    if(!videoRef.current){
-      videoRef.current = new Map()
-    }
-    return videoRef.current
   }
   
   const {nodes, materials} = useLoader(GLTFLoader, '/television.glb');
@@ -97,13 +89,6 @@ function MainEngine() {
               return {...prev, [call.peer]: userStream}
             })
             }
-            setVideosComponent((prev) => {
-              if(!prev.includes(call.peer)){
-                return [...prev, call.peer]
-              }else {
-                return prev
-              }
-            })
           }
 
           if(type.kind === 'audio'){
@@ -119,7 +104,6 @@ function MainEngine() {
         sendModel(socket.current, {peerId: peer.current.id, room: room.current, name: myName})
         getPlayers()
         onDisconnect()
-        setVideosComponent([peer.current.id])
 
         peer.current.on('connection', (conn) => {
           conn.on('open', () => {
@@ -145,29 +129,6 @@ function MainEngine() {
             }
           })
         })
-  }
-
-  useEffect(() => {
-    if(videosComponent.length > 0){
-      const lastItem = videosComponent[videosComponent.length - 1];
-      if(lastItem === peer.current.id){
-        addVideoStream(lastItem, videos[lastItem], true)
-      }else {
-        addVideoStream(lastItem, videos[lastItem], false)
-      }
-    }
-  },[videosComponent])
-  
-  const addVideoStream = (id, stream, me) => {
-    const video = videoRef.current.get(id)
-      video.srcObject = stream
-    if(video){
-      if(me){
-        video.muted = true
-      }
-      video.className = 'w-24'
-      // video.play()
-    }
   }
 
   const getPlayers = () => {
@@ -240,9 +201,6 @@ function MainEngine() {
           }
         }
         const peerId = player.peerId
-        setVideosComponent((prev) => {
-          return prev.filter((key) => key !== peerId)
-        })
         videos[peerId] = null
         if(videoRef.current){
           const currVideo = videoRef.current.get(peerId)
@@ -264,23 +222,6 @@ function MainEngine() {
         {
           !loading ?
           <>
-          <div id='videos' className='fixed top-0 right-0 hidden'>
-            {
-              videosComponent &&
-              videosComponent.map((video, index) => {
-                return (
-                  <video ref={(e) => {
-                    const map = getVideo()
-                    if(e){
-                      map.set(video, e)
-                    }else {
-                      map.delete(video)
-                    }
-                  }} key={index} />
-                )
-              })
-            }
-          </div>
           <BottomBar audioStreamRef={audioStreamRef} videoStreamRef={videoStreamRef} />
           <Info />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
