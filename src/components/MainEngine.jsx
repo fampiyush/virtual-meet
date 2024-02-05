@@ -213,8 +213,10 @@ function MainEngine() {
         }
         setPeerConn((prev) => {
           const conn = prev.find((conn) => conn.peer === peerId)
-          conn.close()
-          return prev.filter((conn) => conn.peer !== peerId)
+          if(conn){
+            conn.close()
+            return prev.filter((conn) => conn.peer !== peerId)
+          }
         })
       }) 
   }
