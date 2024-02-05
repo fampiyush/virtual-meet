@@ -7,7 +7,7 @@ import { PlayerContext } from '../helpers/contextProvider'
 import throttle from 'lodash.throttle'
 import * as THREE from 'three'
 
-const Pov = ({socket, povRef, randomPositionX}) => {
+const Pov = ({socket, povRef, randomPositionX, randomPositionZ}) => {
 
     const {peerConn} = useContext(PlayerContext)
 
@@ -46,7 +46,7 @@ const Pov = ({socket, povRef, randomPositionX}) => {
           {
             povRef.current &&
             <>
-            <PerspectiveCamera ref={povRef} position={[randomPositionX, 0.2, 2]} rotation={[0,0,0]} makeDefault={true} />
+            <PerspectiveCamera ref={povRef} position={[randomPositionX, 0.2, randomPositionZ]} rotation={[0,0,0]} makeDefault={true} />
             <PointerLockControls selector='#canvas' onChange={() => throttleOnChange()} />
             </>
           }
