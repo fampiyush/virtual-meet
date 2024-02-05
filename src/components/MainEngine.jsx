@@ -116,7 +116,7 @@ function MainEngine() {
               const rotation = { _x: povRef.current.rotation._x, _y: povRef.current.rotation._y, _z: povRef.current.rotation._z };
               conn.send({position: position, rotation: rotation, socketId: socket.current.id, peerId: peer.current.id, room: room.current, name: myName });
             }else {
-              conn.send({position: {x: randomPositionX, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
+              conn.send({position: {x: randomPositionX.current, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
             }
           })
           conn.on('data', (data) => {
@@ -216,6 +216,8 @@ function MainEngine() {
           if(conn){
             conn.close()
             return prev.filter((conn) => conn.peer !== peerId)
+          }else {
+            return prev
           }
         })
       }) 
@@ -234,7 +236,7 @@ function MainEngine() {
             <Plane />
             {
               (socket.current && peer.current) &&
-              <Pov socket={socket} povRef={povRef} randomPositionX={randomPositionX} />
+              <Pov socket={socket} povRef={povRef} randomPositionX={randomPositionX.current} />
             }
             {
               playerKeys &&
