@@ -24,7 +24,7 @@ const Pov = ({socket, povRef, randomPositionX}) => {
     
     const throttleOnChange = throttle(onChange, 20);
     useEffect(() => {
-      console.log(randomPositionX)
+
       return () => {
         clearTimeout(throttleOnChange.cancel);
       };
