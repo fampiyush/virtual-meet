@@ -14,6 +14,7 @@ import Pov from './Pov'
 import BottomBar from './BottomBar'
 import { LoaderBar } from '../helpers/loaders'
 import Info from './Info'
+import OwnVideo from './OwnVideo'
 
 function MainEngine() {
 
@@ -29,6 +30,7 @@ function MainEngine() {
   const videoStreamRef = useRef(null)
   const audioStreamRef = useRef(null)
   const povRef = useRef(null)
+  const randomPositionX = Math.random()
 
   const navigate = useNavigate()
   const { meetingId } = useParams()
@@ -113,7 +115,7 @@ function MainEngine() {
               const rotation = { _x: povRef.current.rotation._x, _y: povRef.current.rotation._y, _z: povRef.current.rotation._z };
               conn.send({position: position, rotation: rotation, socketId: socket.current.id, peerId: peer.current.id, room: room.current, name: myName });
             }else {
-              conn.send({position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
+              conn.send({position: {x: randomPositionX, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
             }
           })
           conn.on('data', (data) => {
@@ -139,7 +141,7 @@ function MainEngine() {
       keys.forEach((key) => {
         const conn = peer.current.connect(key.peerId)
         conn.on('open', () => {
-          conn.send({position: {x: 0, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
+          conn.send({position: {x: randomPositionX, y: 0.2, z: 2}, rotation: {_x: 0, _y: 0, _z: 0}, socketId: socket.current.id, peerId: peer.current.id, room:room.current, name: myName})
           setPeerConn((prev) => [...prev, conn])
         })
         conn.on('data', (data) => {
@@ -224,11 +226,12 @@ function MainEngine() {
           <>
           <BottomBar audioStreamRef={audioStreamRef} videoStreamRef={videoStreamRef} />
           <Info />
+          <OwnVideo />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
             <Plane />
             {
               (socket.current && peer.current) &&
-              <Pov socket={socket} povRef={povRef} />
+              <Pov socket={socket} povRef={povRef} randomPositionX={randomPositionX} />
             }
             {
               playerKeys &&
