@@ -30,7 +30,7 @@ function MainEngine() {
   const videoStreamRef = useRef(null)
   const audioStreamRef = useRef(null)
   const povRef = useRef(null)
-  const randomPositionX = Math.random()
+  const randomPositionX = useRef()
 
   const navigate = useNavigate()
   const { meetingId } = useParams()
@@ -60,6 +60,7 @@ function MainEngine() {
       peerConnection.on('open', () => {
         peer.current = peerConnection  
         // console.log(room.current)
+        randomPositionX.current = Math.random()
         getMedia()
         setLoading(false)
       })
