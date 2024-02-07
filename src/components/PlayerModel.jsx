@@ -9,11 +9,11 @@ const PlayerModel = memo((value) => {
 
   const [isVideo, setIsVideo] = React.useState(false)
 
-  const VideoMaterial = memo(({src, attach}) => {
+  const VideoMaterial = ({src, attach}) => {
     const texture = useVideoTexture(src)
 
     return <meshBasicMaterial map={texture} toneMapped={false} attach={attach} />
-  })
+  }
 
   
   const playerData = useMemo(
