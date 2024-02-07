@@ -5,7 +5,7 @@ import { LuRadioTower } from "react-icons/lu"
 import { PlayerContext } from '../helpers/contextProvider'
 import { getMediaStreamAudio, getMediaStreamVideo } from '../helpers/getMedia'
 
-const BottomBar = ({audioStreamRef, videoStreamRef}) => {
+const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
 
     const [globalMicButton, setGlobalMicButton] = useState(false)
     const [localMic, setLocalMic] = useState(false)
@@ -51,14 +51,17 @@ const BottomBar = ({audioStreamRef, videoStreamRef}) => {
                 }
             })
             videoStreamRef.current = null
+            setIsOwnVideo(false)
             return
         }else if(!videoStreamRef.current){
             getMediaStreamVideo(videoStreamRef, playerKeys, peer)
             .then((done) => {
                 if(done){
                     setVideoButton(true)
+                    setIsOwnVideo(true)
                 }else {
                     setVideoButton(false)
+                    setIsOwnVideo(false)
                 }
             })
         }

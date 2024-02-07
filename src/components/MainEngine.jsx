@@ -23,6 +23,7 @@ function MainEngine() {
   const [videos, setVideos] = useState({})
   const [audios, setAudios] = useState({})
   const [audioIcon, setAudioIcon] = useState({})
+  const [isOwnVideo, setIsOwnVideo] = useState(false)
 
   const players = useRef(null)
   const playersRef = useRef(null)
@@ -231,9 +232,9 @@ function MainEngine() {
         {
           !loading ?
           <>
-          <BottomBar audioStreamRef={audioStreamRef} videoStreamRef={videoStreamRef} />
+          <BottomBar audioStreamRef={audioStreamRef} videoStreamRef={videoStreamRef} setIsOwnVideo={setIsOwnVideo} />
           <Info />
-          <OwnVideo />
+          <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
             <Plane />
             {
