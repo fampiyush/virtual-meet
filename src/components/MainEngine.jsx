@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useRef, useState, useContext, Suspense } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Canvas, useLoader } from '@react-three/fiber'
+import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { Stats } from '@react-three/drei'
 import { Peer } from "peerjs"
 import * as THREE from 'three'
@@ -15,6 +15,7 @@ import BottomBar from './BottomBar'
 import { LoaderBar } from '../helpers/loaders'
 import Info from './Info'
 import OwnVideo from './OwnVideo'
+import RightBar from './RightBar'
 
 function MainEngine() {
 
@@ -75,6 +76,19 @@ function MainEngine() {
   }, [])
 
   const Plane = () => {
+
+    const { gl } = useThree()
+
+    useEffect(() => {
+      const closeContext = () => {
+        if (gl) {
+          gl.dispose()
+        }
+      }
+
+      return closeContext
+    },[])
+
     return (
       <mesh rotation={[Math.PI/2, 0, 0]}>
         <planeGeometry args={[10, 10]} />
@@ -235,6 +249,7 @@ function MainEngine() {
           <BottomBar audioStreamRef={audioStreamRef} videoStreamRef={videoStreamRef} setIsOwnVideo={setIsOwnVideo} />
           <Info />
           <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
+          <RightBar />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
             <Plane />
             {
