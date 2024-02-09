@@ -4,12 +4,13 @@ import { FiMaximize2 } from "react-icons/fi"
 
 const OwnVideo = ({videoStreamRef, isOwnVideo}) => {
   
-  const [videoOpened, setVideoOpened] = useState(true)
+  const [videoOpened, setVideoOpened] = useState(false)
 
   useEffect(() => {
     if(isOwnVideo){
       const video = document.getElementById('myVideo')
       video.srcObject = videoStreamRef.current
+      setVideoOpened(true)
     }
   },[isOwnVideo])
 
