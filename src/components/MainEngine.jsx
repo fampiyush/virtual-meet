@@ -25,7 +25,6 @@ function MainEngine() {
   const [audios, setAudios] = useState({})
   const [audioIcon, setAudioIcon] = useState({})
   const [isOwnVideo, setIsOwnVideo] = useState(false)
-  const [endedBox, setEndedBox] = useState(false)
 
   const players = useRef(null)
   const playersRef = useRef(null)
@@ -244,13 +243,13 @@ function MainEngine() {
 
   const onMeetingEnd = () => {
     socket.current.on('admin-ended-call', () => {
-      setEndedBox(true)
       socket.current.disconnect()
       peer.current.destroy()
       setPlayerKeys([])
       setPeerConn([])
+      setLoading(true)
       setTimeout(() => {
-        navigate('/')
+        navigate('/', {replace: true, state: {fromAdmin: true}})
       }, 1000)
     })
   }
@@ -300,11 +299,6 @@ function MainEngine() {
           :
           <LoaderBar />
     }
-    </div>
-    <div className={`fixed w-[100%] top-2 flex justify-center text-center z-10 ${endedBox ? '' : 'hidden'}`}>
-      <div className='bg-[#5c89d1] rounded p-1'>
-          <p className='text-white text-sm'>Host has ended the meeting</p>
-      </div>
     </div>
     </Suspense>
   )
