@@ -13,7 +13,7 @@ const JoinForm = () => {
         name: false
     });
     const [loading, setLoading] = useState(false)
-    const {setMyName, socket, room} = useContext(PlayerContext)
+    const {setMyName, socket, room, setIsAdmin} = useContext(PlayerContext)
 
     const navigate = useNavigate()
 
@@ -69,6 +69,7 @@ const JoinForm = () => {
             room.current = value.room
             setMyName([name])
             setLoading(false)
+            setIsAdmin(true)
             navigate(`/${value.room}/3d`)
         })
     }

@@ -8,13 +8,14 @@ const ContextProvider = ({ children }) => {
     const [playerKeys, setPlayerKeys] = useState([]);
     const [myName, setMyName] = useState('');
     const [peerConn, setPeerConn] = useState([]);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const socket = useRef(null);
     const peer = useRef(null);
     const room = useRef(null);
 
     return (
-        <PlayerContext.Provider value={{ playerKeys, setPlayerKeys, myName, setMyName, peerConn, setPeerConn, socket, peer, room }}>
+        <PlayerContext.Provider value={{ playerKeys, setPlayerKeys, myName, setMyName, peerConn, setPeerConn, socket, peer, room, isAdmin, setIsAdmin }}>
             {children}
         </PlayerContext.Provider>
     );
