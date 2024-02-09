@@ -2,7 +2,7 @@ import React,{ useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ImPhoneHangUp } from "react-icons/im"
 import { PlayerContext } from '../helpers/contextProvider'
-import { IoClose } from "react-icons/io5"
+import { IoClose, IoChatboxEllipses, IoSettings } from "react-icons/io5"
 import { LoaderSync } from '../helpers/loaders'
 
 const RightBar = () => {
@@ -50,14 +50,25 @@ const RightBar = () => {
             <LoaderSync />
         </div>
     }
-    <div className='fixed bottom-3 right-2 z-10'>
-        <button onClick={onLeave} className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white'>
-        <div className='mt-2 ml-[0.1rem]'>
-            <ImPhoneHangUp size={30} color='#db3954' />
-        </div>
+    <div className='fixed bottom-3 right-2 z-10 flex'>
+        <button className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white'>
+            <div className='mt-3 ml-[0.1rem]'>
+                <IoChatboxEllipses size={30} color='#5c89d1' />
+            </div>
+        </button>
+        <button className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white ml-2'>
+            <div className='mt-[10px] ml-[0.1rem]'>
+                <IoSettings size={30} color='#5c89d1' />
+            </div>
+        </button>
+        <button onClick={onLeave} className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white ml-2'>
+            <div className='mt-2 ml-[0.1rem]'>
+                <ImPhoneHangUp size={30} color='#db3954' />
+            </div>
         </button>
     </div>
 
+    {/* End meeting dialog box */}
     <div className={`fixed bottom-16 right-1 z-10 bg-[#5c89d1] rounded min-w-52 ${leaveBox ? '' : 'hidden'}`}>
         <button className='absolute top-0 right-0' onClick={() => setLeaveBox(false)}>
             <IoClose size={25} color='#fff' />
