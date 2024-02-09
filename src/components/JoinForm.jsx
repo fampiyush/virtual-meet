@@ -56,7 +56,7 @@ const JoinForm = () => {
                 room.current = value.room
                 setMyName([name])
                 setLoading(false)
-                navigate(`/${value.room}/3d`)
+                navigate(`/${value.room}/3d`, {replace: true})
             }else {
                 setLoading(false)
                 value.socket.disconnect()
@@ -81,7 +81,7 @@ const JoinForm = () => {
             setMyName([name])
             setLoading(false)
             setIsAdmin(true)
-            navigate(`/${value.room}/3d`)
+            navigate(`/${value.room}/3d`, {replace: true})
         })
     }
 

@@ -40,7 +40,7 @@ const JoinLink = () => {
             return
         }
         setMyName([name])
-        navigate(`/${room.current}/3d`)
+        navigate(`/${room.current}/3d`, {replace: true})
     };
 
     return (

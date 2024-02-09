@@ -21,7 +21,7 @@ const RightBar = () => {
         setPeerConn([])
         setTimeout(() => {
             setLoading(false)
-            navigate('/')
+            navigate('/', {replace: true})
         }, 500)
     }
 
