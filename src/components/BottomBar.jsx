@@ -20,10 +20,10 @@ const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
 
     useEffect(() => {
         const onDocumentKey = (e) => {
-            if(e.ctrlKey && e.code === 'KeyC'){
+            if(e.ctrlKey && e.shiftKey && e.code === 'KeyZ'){
                 !audioDisabled ? handleAudio() : null
             }
-            if(e.ctrlKey && e.code === 'KeyV'){
+            if(e.ctrlKey && e.shiftKey && e.code === 'KeyX'){
                 !videoDisabled ? handleVideo() : null
             }
         }
@@ -106,24 +106,24 @@ const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
                 <div onClick={handleAudio} className={`px-1 pt-1 hover:bg-white rounded ${audioDisabled ? 'disabled opacity-50' : ''}`}>
                     {
                         globalMicButton ?
-                        <BsMicFill color='#5c89d1' size={40} title='Global Mic, Everyone can hear you' />
+                        <BsMicFill color='#5c89d1' size={40} title='Shortcut: Ctrl + Shift + Z' />
                         :
-                        <BsMicMuteFill color='#5c89d1' size={40} title='Global Mic, Everyone can hear you' />
+                        <BsMicMuteFill color='#5c89d1' size={40} className='ml-2' title='Shortcut: Ctrl+Shift+Z' />
                     }
-                    <p className='text-xs text-[#000] select-none'>Ctrl+C</p>
+                    <p className='text-xs text-[#000] select-none'>Global Mic</p>
                 </div>
                 <div className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
-                    <LuRadioTower color='#5c89d1' size={40} title='Local Mic, Only person closer to you can hear' />
-                    <p className='text-xs text-[#000] select-none'>Hold T</p>
+                    <LuRadioTower color='#5c89d1' size={40} className='ml-[6px]' title='Hold T' />
+                    <p className='text-xs text-[#000] select-none'>Local Mic</p>
                 </div>
                 <div onClick={videoDisabled ? null : handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-50' : ''}`}>
                     {
                         videoButton ?
-                        <BsCameraVideoFill color='#5c89d1' size={40} title='Video will be shown as screen' />
+                        <BsCameraVideoFill color='#5c89d1' size={40} title='Shortcut: Ctrl+Shift+X' />
                         :
-                        <BsCameraVideoOffFill color='#5c89d1' size={40} title='Video will be shown as screen' />
+                        <BsCameraVideoOffFill color='#5c89d1' size={40} title='Shortcut: Ctrl+Shift+X' />
                     }
-                    <p className='text-xs text-[#000] select-none'>Ctrl+V</p>
+                    <p className='text-xs text-[#000] select-none'>Video</p>
                 </div>    
             </div>
         </div>
