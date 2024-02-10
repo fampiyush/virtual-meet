@@ -8,7 +8,11 @@ import { LoaderSync } from '../helpers/loaders'
 const RightBar = () => {
   
     const [loading, setLoading] = useState(false)
-    const [leaveBox, setLeaveBox] = useState(false)
+    const [boxes, setBoxes] = useState({
+        chat: false,
+        settings: false,
+        leave: false
+    })
     const { socket, peer, setPlayerKeys, setPeerConn, isAdmin } = useContext(PlayerContext)
 
     const navigate = useNavigate()
@@ -39,7 +43,7 @@ const RightBar = () => {
     }
 
     const onLeave = () => {
-        setLeaveBox((prev) => !prev)
+        setBoxes((prev) => ({...prev, leave: !prev.leave}))
     }
   
     return (
@@ -69,8 +73,8 @@ const RightBar = () => {
     </div>
 
     {/* End meeting dialog box */}
-    <div className={`fixed bottom-16 right-1 z-10 bg-[#5c89d1] rounded min-w-52 ${leaveBox ? '' : 'hidden'}`}>
-        <button className='absolute top-0 right-0 hover:bg-gray-400 rounded-full' onClick={() => setLeaveBox(false)}>
+    <div className={`fixed bottom-16 right-1 z-10 bg-[#5c89d1] rounded min-w-52 ${boxes.leave ? '' : 'hidden'}`}>
+        <button className='absolute top-0 right-0 hover:bg-gray-400 rounded-full' onClick={() => setBoxes({...boxes, leave: false})}>
             <IoClose size={25} color='#fff' />
         </button>
         <div className='py-3 px-8 flex flex-col mt-2'>
