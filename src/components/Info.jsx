@@ -57,7 +57,7 @@ const Info = () => {
             :
             <div className='fixed top-1 left-1 z-20 2xl:max-w-[20%] xl:max-w-[25%] lg:max-w-[30%] md:max-w-[35%] max-w-[55%] p-2 bg-[#5c89d1] rounded flex-col text-center'>
                 <div className='absolute right-1 top-1'>
-                    <button className='active:opacity-50' onClick={() => setShowModal(false)}>
+                    <button className='active:opacity-50 hover:bg-gray-400 rounded-full' onClick={() => setShowModal(false)}>
                         <IoClose size={25} color='#fff' />
                     </button>
                 </div>
