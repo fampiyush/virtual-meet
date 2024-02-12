@@ -55,6 +55,7 @@ function MainEngine() {
       navigate(`/${meetingId}`)
       return
     }
+    sessionStorage.clear()
     try {
       const peerConnection = new Peer({
         host: (import.meta.env.VITE_PEER_HOST),
@@ -145,6 +146,14 @@ function MainEngine() {
               setAudioIcon((prev) => {
                 return {...prev, [data.socketId]: data.audio}
               })
+            }else if(data.type === 'chat'){
+              let curr = JSON.parse(sessionStorage.getItem(data.channel))
+              if(!curr){
+                curr = [data.message]
+              }else {
+                curr.unshift(data.message)
+              }
+              sessionStorage.setItem(data.channel, JSON.stringify(curr))
             }else {
               updatePlayers(data)
             }
@@ -171,6 +180,14 @@ function MainEngine() {
             setAudioIcon((prev) => {
               return {...prev, [data.socketId]: data.audio}
             })
+          }else if(data.type === 'chat'){
+            let curr = JSON.parse(sessionStorage.getItem(data.channel))
+            if(!curr){
+              curr = [data.message]
+            }else {
+              curr.unshift(data.message)
+            }
+            sessionStorage.setItem(data.channel, JSON.stringify(curr))
           }else {
             updatePlayers(data)
           }

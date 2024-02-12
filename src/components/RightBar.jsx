@@ -4,6 +4,7 @@ import { ImPhoneHangUp } from "react-icons/im"
 import { PlayerContext } from '../helpers/contextProvider'
 import { IoClose, IoChatboxEllipses, IoSettings } from "react-icons/io5"
 import { LoaderSync } from '../helpers/loaders'
+import ChatBox from './ChatBox'
 
 const RightBar = () => {
   
@@ -43,7 +44,11 @@ const RightBar = () => {
     }
 
     const onLeave = () => {
-        setBoxes((prev) => ({...prev, leave: !prev.leave}))
+        setBoxes((prev) => ({chat: false, settings: false, leave: !prev.leave}))
+    }
+
+    const onChat = () => {
+        setBoxes((prev) => ({settings: false, leave: false, chat: !prev.chat}))
     }
   
     return (
@@ -55,7 +60,7 @@ const RightBar = () => {
         </div>
     }
     <div className='fixed bottom-3 right-2 z-10 flex'>
-        <button className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white'>
+        <button onClick={onChat} className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white'>
             <div className='mt-3 ml-[0.1rem]'>
                 <IoChatboxEllipses size={30} color='#5c89d1' />
             </div>
@@ -71,9 +76,14 @@ const RightBar = () => {
             </div>
         </button>
     </div>
+    
+    {/* Chat dialog box */}
+    <div className={`${boxes.chat ? '' : 'hidden'}`}>
+        <ChatBox setBoxes={setBoxes} boxes={boxes} />
+    </div>
 
     {/* End meeting dialog box */}
-    <div className={`fixed bottom-16 right-1 z-10 bg-[#5c89d1] rounded min-w-52 ${boxes.leave ? '' : 'hidden'}`}>
+    <div className={`fixed bottom-[70px] right-1 z-10 bg-[#5c89d1] rounded min-w-52 ${boxes.leave ? '' : 'hidden'}`}>
         <button className='absolute top-0 right-0 hover:bg-gray-400 rounded-full' onClick={() => setBoxes({...boxes, leave: false})}>
             <IoClose size={25} color='#fff' />
         </button>
