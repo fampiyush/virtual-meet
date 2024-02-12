@@ -149,11 +149,16 @@ function MainEngine() {
             }else if(data.type === 'chat'){
               let curr = JSON.parse(sessionStorage.getItem(data.channel))
               if(!curr){
-                curr = [data.message]
+                curr = [{id: data.id, name: players.current[data.id].name, message: data.message}]
               }else {
-                curr.unshift(data.message)
+                if(curr[0].id === data.id){
+                  curr.unshift({id: data.id, name: players.current[data.id].name, message: data.message, prev: true})
+                }else {
+                  curr.unshift({id: data.id, name: players.current[data.id].name, message: data.message})
+                }
               }
               sessionStorage.setItem(data.channel, JSON.stringify(curr))
+              document.dispatchEvent(new Event('chat'))
             }else {
               updatePlayers(data)
             }
@@ -183,11 +188,16 @@ function MainEngine() {
           }else if(data.type === 'chat'){
             let curr = JSON.parse(sessionStorage.getItem(data.channel))
             if(!curr){
-              curr = [data.message]
+              curr = [{id: data.id, name: players.current[data.id].name, message: data.message}]
             }else {
-              curr.unshift(data.message)
+              if(curr[0].id === data.id){
+                curr.unshift({id: data.id, name: players.current[data.id].name, message: data.message, prev: true})
+              }else {
+                curr.unshift({id: data.id, name: players.current[data.id].name, message: data.message})
+              }
             }
             sessionStorage.setItem(data.channel, JSON.stringify(curr))
+            document.dispatchEvent(new Event('chat'))
           }else {
             updatePlayers(data)
           }
