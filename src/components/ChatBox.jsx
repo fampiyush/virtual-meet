@@ -24,7 +24,6 @@ const ChatBox = ({setBoxes, boxes}) => {
                 }
                 setChats(data)
             }
-            console.log(nameColors.current)
         }
         document.addEventListener('chat', getData)
     },[])
