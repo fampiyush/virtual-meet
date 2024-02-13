@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import { PlayerContext } from '../helpers/contextProvider'
 import { IoClose, IoSend } from "react-icons/io5"
 
@@ -9,12 +9,22 @@ const ChatBox = ({setBoxes, boxes}) => {
     const [chats, setChats] = useState([])
     const [currChat, setCurrChat] = useState('all')
 
+    const nameColors = useRef({})
+    const randomColors = useRef([])
+
     useEffect(() => {
         const getData = () => {
+            if(randomColors.current.length === 0){
+                randomColors.current = ['#7dcceb', '#eb7d7d', '#ebe07d', '#e77deb']
+            }
             const data = JSON.parse(sessionStorage.getItem('all'))
             if(data){
+                if(!nameColors.current[data[0].id]){
+                    nameColors.current[data[0].id] = randomColors.current.pop()
+                }
                 setChats(data)
             }
+            console.log(nameColors.current)
         }
         document.addEventListener('chat', getData)
     },[])
@@ -53,13 +63,17 @@ const ChatBox = ({setBoxes, boxes}) => {
                     chats.map((chat, index) => {
                         return(
                             <div key={index}>
-                                {
-                                    (currChat === 'all' && chat.id !== socket.id && !chat.prev) &&
-                                    <p className='text-[10px] text-gray-200'>{chat.name}</p>
-                                }
                                 <p 
                                     className={`p-1 ${chat.prev ? 'mt-[0.1rem]' : 'mt-1'}  max-w-[80%] rounded-lg break-words ${chat.id === socket.id ? 'float-end bg-[#498d73]' : 'float-start bg-[#445b80]'}`}
-                                >{chat.message}</p>
+                                >{
+                                    <span className='flex flex-col'>
+                                        {
+                                        (currChat === 'all' && chat.id !== socket.id && !chat.prev) &&
+                                        <span className='text-[10px]' style={{color: nameColors.current[chat.id]}}>{chat.name}</span>
+                                        }
+                                        {chat.message}
+                                    </span>
+                               }</p>
                             </div>
                         )
                     })
