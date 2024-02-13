@@ -14,6 +14,7 @@ const RightBar = () => {
         settings: false,
         leave: false
     })
+    const [chatDot, setChatDot] = useState(false)
     const { socket, peer, setPlayerKeys, setPeerConn, isAdmin } = useContext(PlayerContext)
 
     const navigate = useNavigate()
@@ -49,6 +50,7 @@ const RightBar = () => {
 
     const onChat = () => {
         setBoxes((prev) => ({settings: false, leave: false, chat: !prev.chat}))
+        setChatDot(false)
     }
   
     return (
@@ -63,6 +65,7 @@ const RightBar = () => {
         <button onClick={onChat} className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white'>
             <div className='mt-3 ml-[0.1rem]'>
                 <IoChatboxEllipses size={30} color='#5c89d1' />
+                <div className={`bg-[#ffff3d] w-3 h-3 relative -top-8 left-5 rounded-full ${chatDot ? '' : 'hidden'}`}></div>
             </div>
         </button>
         <button className='bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white ml-2'>
@@ -78,8 +81,8 @@ const RightBar = () => {
     </div>
     
     {/* Chat dialog box */}
-    <div className={`${boxes.chat ? '' : 'hidden'}`}>
-        <ChatBox setBoxes={setBoxes} boxes={boxes} />
+    <div>
+        <ChatBox setBoxes={setBoxes} boxes={boxes} setChatDot={setChatDot} />
     </div>
 
     {/* End meeting dialog box */}
