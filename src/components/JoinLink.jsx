@@ -30,6 +30,10 @@ const JoinLink = () => {
                 navigate(`/`)
             }
         })
+
+        if(localStorage.getItem('name')){
+            setName(localStorage.getItem('name'))
+        }
     },[])
 
     const handleSubmit = (e) => {
@@ -40,6 +44,7 @@ const JoinLink = () => {
             return
         }
         setMyName([name])
+        localStorage.setItem('name', name)
         navigate(`/${room.current}/3d`, {replace: true})
     };
 
@@ -55,7 +60,7 @@ const JoinLink = () => {
                 <form onSubmit={handleSubmit}>
                     <div className='mb-4'>
                         <div>
-                            <label htmlFor="name">UserName: </label>
+                            <label htmlFor="name" className='text-lg'>UserName: </label>
                         </div>
                         <input
                             type="text"

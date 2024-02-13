@@ -26,6 +26,10 @@ const JoinForm = () => {
                 setEndedBox(false)
             }, 4000)
         }
+
+        if(localStorage.getItem('name')){
+            setName(localStorage.getItem('name'))
+        }
     },[])
 
     const handleSubmit = (e) => {
@@ -55,6 +59,7 @@ const JoinForm = () => {
                 socket.current = value.socket
                 room.current = value.room
                 setMyName([name])
+                localStorage.setItem('name', name)
                 setLoading(false)
                 navigate(`/${value.room}/3d`, {replace: true})
             }else {
@@ -79,6 +84,7 @@ const JoinForm = () => {
             socket.current = value.socket
             room.current = value.room
             setMyName([name])
+            localStorage.setItem('name', name)
             setLoading(false)
             setIsAdmin(true)
             navigate(`/${value.room}/3d`, {replace: true})
@@ -97,7 +103,7 @@ const JoinForm = () => {
                     <h1 className='mb-8 text-xl text-center'>Virtual Meet</h1>
                     <div className='mb-4'>
                         <div>
-                            <label htmlFor="name">UserName: </label>
+                            <label htmlFor="name" className='text-lg'>UserName: </label>
                         </div>
                         <input
                             type="text"
@@ -116,7 +122,7 @@ const JoinForm = () => {
                     </div>
                     <form onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="meetingId">Meeting ID: </label>
+                            <label htmlFor="meetingId" className='text-lg'>Meeting ID: </label>
                         </div>
                         <div>
                             <input
