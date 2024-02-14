@@ -106,7 +106,7 @@ const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
                 <div onClick={handleAudio} className={`px-1 pt-1 hover:bg-white rounded ${audioDisabled ? 'disabled opacity-50' : ''}`}>
                     {
                         globalMicButton ?
-                        <BsMicFill color='#5c89d1' size={40} title='Shortcut: Ctrl + Shift + Z' />
+                        <BsMicFill color='#5c89d1' size={40} className='ml-2' title='Shortcut: Ctrl + Shift + Z' />
                         :
                         <BsMicMuteFill color='#5c89d1' size={40} className='ml-2' title='Shortcut: Ctrl+Shift+Z' />
                     }
