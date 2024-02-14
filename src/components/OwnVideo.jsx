@@ -11,6 +11,8 @@ const OwnVideo = ({videoStreamRef, isOwnVideo}) => {
       const video = document.getElementById('myVideo')
       video.srcObject = videoStreamRef.current
       setVideoOpened(true)
+    }else {
+      setVideoOpened(false)
     }
   },[isOwnVideo])
 
