@@ -21,17 +21,21 @@ const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
     useEffect(() => {
         const onDocumentKey = (e) => {
             if(e.ctrlKey && e.shiftKey && e.code === 'KeyZ'){
-                !audioDisabled ? handleAudio() : null
+                if(!audioDisabled){
+                    handleAudio()
+                }
             }
             if(e.ctrlKey && e.shiftKey && e.code === 'KeyX'){
-                !videoDisabled ? handleVideo() : null
+                if(!videoDisabled){
+                    handleVideo()
+                }
             }
         }
         document.addEventListener('keydown', onDocumentKey)
         return () => {
-          document.removeEventListener('keydown', onDocumentKey)
+            document.removeEventListener('keydown', onDocumentKey)
         }
-    }, [audioDisabled, videoDisabled])
+    }, [playerKeys])
 
     // useEffect(() => {
     //     getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer, true)
