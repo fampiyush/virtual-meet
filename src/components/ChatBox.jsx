@@ -67,9 +67,9 @@ const ChatBox = ({setBoxes, boxes, setChatDot}) => {
 
   return (
     <>
-        <div className={`fixed bottom-[70px] right-2 z-10 bg-[#5c89d1] rounded w-72 h-[55%] ${boxes.chat ? '' : 'hidden'}`}>
-            <button className='absolute -top-4 -right-2 bg-[#445b80] rounded-full hover:scale-110' onClick={() => setBoxes({...boxes, chat: false})}>
-                <IoClose size={20} color='#fff' />
+        <div className={`fixed bottom-[70px] right-2 z-10 bg-[#5c89d1] rounded-b rounded-tl w-72 h-[55%] ${boxes.chat ? '' : 'hidden'}`}>
+            <button className='absolute -top-5 right-0 bg-[#5c89d1] rounded-t hover:text-gray-300' onClick={() => setBoxes({...boxes, chat: false})}>
+                <IoClose size={20} />
             </button>
             <div className='flex flex-col h-full'>
                 <div className='flex justify-between px-2 mt-1 border-b-2 rounded pb-1'>
