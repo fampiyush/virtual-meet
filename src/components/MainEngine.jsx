@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useContext, Suspense } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
-import { Stats } from '@react-three/drei'
+import { Stats, Sky } from '@react-three/drei'
 import { Peer } from "peerjs"
 import * as THREE from 'three'
 import { sendModel } from '../helpers/socketConnection'
@@ -95,6 +95,14 @@ function MainEngine() {
         <planeGeometry args={[10, 10]} />
         <meshBasicMaterial side={THREE.DoubleSide} />
       </mesh>
+    )
+  }
+
+  const Environment = () => {
+    const gltf = useLoader(GLTFLoader, '/joined-2.glb')
+
+    return (
+      <primitive object={gltf.scene} scale={[0.5, 0.5, 0.5]} />
     )
   }
 
@@ -292,7 +300,15 @@ function MainEngine() {
           <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
           <RightBar />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
-            <Plane />
+            {/* <Plane /> */}
+            <Sky
+             distance={450000}
+             sunPosition={[5, 1, 8]}
+             inclination={0}
+             azimuth={0.25}
+            />
+            <Environment />
+            <ambientLight />
             {
               (socket.current && peer.current) &&
               <Pov socket={socket} povRef={povRef} randomPositionX={randomPositionX.current} randomPositionZ={randomPositionZ.current} />
@@ -310,6 +326,7 @@ function MainEngine() {
                     video={videos ? videos[key.peerId] : null}
                     audio={audios ? audios[key.peerId] : null} 
                     name={players.current[key.socketId].name}
+                    povRef={povRef}
                     audioIcon={audioIcon[key.socketId]} 
                     nodes={nodes} 
                     materials={materials} videos={videos}

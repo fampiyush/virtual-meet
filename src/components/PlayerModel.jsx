@@ -43,7 +43,7 @@ const PlayerModel = memo((value) => {
     return (
       <group position={[0, 0.2, 0]} ref={playerNameRef} rotation={[0, 3.2, 0]}>
         <Html distanceFactor={1} occlude='blending' zIndexRange={[0,0]} transform>
-        <div className='max-w-52 flex items-center justify-center'>
+        <div className='max-w-52 flex items-center justify-center relative'>
           <div className='flex items-center justify-center h-10 px-2 mr-1 bg-gray-900 text-white rounded select-none'>
             {playerData.name}
           </div>
