@@ -29,16 +29,22 @@ const ChatBox = ({setBoxes, boxes, setChatDot}) => {
                     nameColors.current[data[0].id] = randomColors.current.pop()
                 }
                 setChats(data)
-                const truncatedMessage = data[0].message.length > 30 ? data[0].message.substring(0, 30) + '...' : data[0].message;
-                setNotifications({show: true, message: truncatedMessage, name: data[0].name, color: nameColors.current[data[0].id]})
-                setChatDot(true)
-                setTimeout(() => {
-                    setNotifications({show: false, message: ''})
-                }, 4000)
+                if(!boxes.chat){
+                    const truncatedMessage = data[0].message.length > 30 ? data[0].message.substring(0, 30) + '...' : data[0].message;
+                    setNotifications({show: true, message: truncatedMessage, name: data[0].name, color: nameColors.current[data[0].id]})
+                    setChatDot(true)
+                    setTimeout(() => {
+                        setNotifications({show: false, message: ''})
+                    }, 4000)
+                }
             }
         }
         document.addEventListener('chat', getData)
-    },[])
+
+        return () => {
+            document.removeEventListener('chat', getData)
+        }
+    },[boxes.chat])
 
     useEffect(() => {
         if(boxes.chat){
