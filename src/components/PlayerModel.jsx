@@ -2,12 +2,14 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unknown-property */
 import React, { memo, useEffect, useMemo, Suspense, useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { useVideoTexture, Html } from '@react-three/drei'
 import { BsMicFill, BsMicMuteFill } from "react-icons/bs"
 
 const PlayerModel = memo((value) => {
 
   const [isVideo, setIsVideo] = React.useState(false)
+  const playerNameRef = useRef()
 
   const VideoMaterial = ({src, attach}) => {
     const texture = useVideoTexture(src)
@@ -15,6 +17,11 @@ const PlayerModel = memo((value) => {
     return <meshBasicMaterial map={texture} toneMapped={false} attach={attach} />
   }
 
+  useFrame(() => {
+    if(playerNameRef.current){
+      playerNameRef.current.lookAt(value.povRef.current.position.x, value.povRef.current.position.y + 0.2, value.povRef.current.position.z)
+    }
+  })
   
   const playerData = useMemo(
     () => ({
@@ -34,9 +41,9 @@ const PlayerModel = memo((value) => {
     
   const PlayerName = () => {
     return (
-      <group position={[0, 0.2, 0]}>
-        <Html distanceFactor={1} occlude='blending' zIndexRange={[0,0]}>
-        <div className='w-52 flex items-center justify-center relative right-[105px]'>
+      <group position={[0, 0.2, 0]} ref={playerNameRef} rotation={[0, 3.2, 0]}>
+        <Html distanceFactor={1} occlude='blending' zIndexRange={[0,0]} transform>
+        <div className='max-w-52 flex items-center justify-center'>
           <div className='flex items-center justify-center h-10 px-2 mr-1 bg-gray-900 text-white rounded select-none'>
             {playerData.name}
           </div>
