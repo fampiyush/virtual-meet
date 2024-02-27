@@ -73,14 +73,13 @@ const ChatBox = ({setBoxes, boxes, setChatDot}) => {
 
   return (
     <>
-        <div className={`fixed bottom-[70px] right-2 z-10 bg-[#5c89d1] rounded-b rounded-tl w-72 h-[55%] ${boxes.chat ? '' : 'hidden'}`}>
-            <button className='absolute -top-5 right-0 bg-[#5c89d1] rounded-t hover:text-gray-300' onClick={() => setBoxes({...boxes, chat: false})}>
-                <IoClose size={20} />
-            </button>
+        <div className={`fixed bottom-[70px] right-2 z-10 bg-[#5c89d1] rounded w-72 h-[55%] ${boxes.chat ? '' : 'hidden'}`}>
             <div className='flex flex-col h-full'>
                 <div className='flex justify-between px-2 mt-1 border-b-2 rounded pb-1'>
-                    <img src='/placeholder.jpg' width={24} className='rounded-full' />
                     <p>All Chat</p>
+                    <button className='rounded-full hover:bg-gray-400' onClick={() => setBoxes({...boxes, chat: false})}>
+                        <IoClose size={23} />
+                    </button>
                 </div>
                 <div className='w-full flex-1 mt-1 px-2 overflow-y-scroll no-scrollbar flex flex-col-reverse'>
                     {
