@@ -116,8 +116,8 @@ const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
                     }
                     <p className='text-xs text-[#000] select-none'>Global Mic</p>
                 </div>
-                <div className='px-1 pt-1 hover:bg-white rounded active:opacity-50'>
-                    <LuRadioTower color='#5c89d1' size={40} className='ml-[6px]' title='Hold T' />
+                <div className='px-1 pt-1 rounded'>
+                    <LuRadioTower color='#8a93a1' size={40} className='ml-[6px]' title='Coming Soon' />
                     <p className='text-xs text-[#000] select-none'>Local Mic</p>
                 </div>
                 <div onClick={videoDisabled ? null : handleVideo} className={`px-1 pt-1 hover:bg-white rounded ${videoDisabled ? 'disabled opacity-50' : ''}`}>

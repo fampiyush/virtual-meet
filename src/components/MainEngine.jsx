@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useContext, Suspense } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
-import { Stats, Sky } from '@react-three/drei'
+import { Stats, Stars } from '@react-three/drei'
 import { Peer } from "peerjs"
 import * as THREE from 'three'
 import { sendModel } from '../helpers/socketConnection'
@@ -46,7 +46,6 @@ function MainEngine() {
   }
   
   const {nodes, materials} = useLoader(GLTFLoader, '/television.glb');
-  // materials['Scene_-_Root'].color = new THREE.Color('grey');
 
   const placeHolder = useLoader(THREE.TextureLoader, '/placeholder.jpg')
 
@@ -63,7 +62,6 @@ function MainEngine() {
       });
       peerConnection.on('open', () => {
         peer.current = peerConnection  
-        // console.log(room.current)
         randomPositionX.current = Math.random()
         randomPositionZ.current = (Math.random()*2)+2
         getMedia()
@@ -92,17 +90,9 @@ function MainEngine() {
 
     return (
       <mesh rotation={[Math.PI/2, 0, 0]}>
-        <planeGeometry args={[10, 10]} />
+        <planeGeometry args={[20, 20]} />
         <meshBasicMaterial side={THREE.DoubleSide} />
       </mesh>
-    )
-  }
-
-  const Environment = () => {
-    const gltf = useLoader(GLTFLoader, '/joined-2.glb')
-
-    return (
-      <primitive object={gltf.scene} scale={[0.5, 0.5, 0.5]} />
     )
   }
 
@@ -110,7 +100,6 @@ function MainEngine() {
       peer.current.on('call', call => {
         call.answer()
         call.on('stream', userStream => {
-          // console.log('receiving from', call.peer)
           const type = userStream.getTracks()[0]
           if(type.kind === 'video'){
             if(!videos[call.peer]){
@@ -129,7 +118,6 @@ function MainEngine() {
           }
         })
       })
-        // console.log('Me', peer.current.id)
         sendModel(socket.current, {peerId: peer.current.id, room: room.current, name: myName})
         getPlayers()
         onDisconnect()
@@ -300,22 +288,15 @@ function MainEngine() {
           <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
           <RightBar />
           <Canvas id='canvas' camera={{position: [0, 0.5, 0.3]}}>
-            {/* <Plane /> */}
-            <Sky
-             distance={450000}
-             sunPosition={[5, 1, 8]}
-             inclination={0}
-             azimuth={0.25}
-            />
-            <Environment />
-            <ambientLight />
+            <Plane />
+            <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
             {
               (socket.current && peer.current) &&
               <Pov socket={socket} povRef={povRef} randomPositionX={randomPositionX.current} randomPositionZ={randomPositionZ.current} />
             }
             {
               playerKeys &&
-              playerKeys.map((key, index) => {
+              playerKeys.map((key) => {
                 return (
                   <PlayerModel
                     refe={key.socketId} 
@@ -335,10 +316,9 @@ function MainEngine() {
                 )
               })
             }
-            <gridHelper />
-            {/* <OrbitControls /> */}
+            <gridHelper args={[20, 20]} />
           </Canvas>    
-          <Stats className='flex justify-end right-0 pointer-events-none z-50' />
+          {/* <Stats className='flex justify-end right-0 pointer-events-none z-50' /> */}
           </>
           :
           <LoaderBar />
