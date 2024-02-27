@@ -16,7 +16,6 @@ const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
 
     const { peerConn, socket, peer, playerKeys } = useContext(PlayerContext)
 
-    // const debouncedSetVideoStream = debounce(setVideoStream, 1000)
 
     useEffect(() => {
         const onDocumentKey = (e) => {
@@ -36,10 +35,6 @@ const BottomBar = ({audioStreamRef, videoStreamRef, setIsOwnVideo}) => {
             document.removeEventListener('keydown', onDocumentKey)
         }
     }, [playerKeys])
-
-    // useEffect(() => {
-    //     getMediaStreamAudio(audioStreamRef, playerKeys, peerConn, socket, peer, true)
-    // },[])
 
     const handleVideo = () => {
         setVideoDisabled(true)
