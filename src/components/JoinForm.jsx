@@ -142,12 +142,12 @@ const JoinForm = () => {
                             error.meetingId && <p className='text-[red] text-sm mt-1'>{error.meetingMessage}</p>
                         }
                         <div className='w-full text-center mt-4'>
-                            <button className='border bg-[#5c89d1] p-1' type="submit">Join Meeting</button>
+                            <button className='border bg-[#5c89d1] p-1 rounded hover:scale-105 duration-300' type="submit">Join Meeting</button>
                         </div>
                     </form>
                     <div className='mt-2 text-center'>
                     <h1>OR</h1>
-                    <button onClick={onNewMeet} className='mt-2 border bg-[#5c89d1] p-1'>Create Meeting</button>
+                    <button onClick={onNewMeet} className='mt-2 border bg-[#5c89d1] p-1 rounded hover:scale-105 duration-300'>Create Meeting</button>
                     </div>
                 </div>
             </div>

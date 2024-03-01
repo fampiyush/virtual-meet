@@ -80,7 +80,7 @@ const JoinLink = () => {
                         }
                     </div>
                     <div className='w-full text-center mt-4'>
-                        <button className='border bg-[#5c89d1] p-1' type="submit">Join Meeting</button>
+                        <button className='border bg-[#5c89d1] p-1 rounded hover:scale-105 duration-300' type="submit">Join Meeting</button>
                     </div>
                 </form>
             </div>
