@@ -1,13 +1,15 @@
-import React,{ useState } from 'react'
+import React,{ useState, useContext } from 'react'
 import { useParams } from 'react-router-dom'
+import { PlayerContext } from '../helpers/contextProvider'
 import { IoMdInformationCircleOutline } from "react-icons/io"
 import { MdOutlineContentCopy, MdLock } from "react-icons/md"
 import { IoClose } from "react-icons/io5"
 import { FaCheck } from "react-icons/fa6"
 
 const Info = () => {
-
-    const [showModal, setShowModal] = useState(false)
+    
+    const { isAdmin } = useContext(PlayerContext)
+    const [showModal, setShowModal] = useState(isAdmin)
     const [checkId, setCheckId] = useState(false)
     const [checkLink, setCheckLink] = useState(false)
 
