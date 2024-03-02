@@ -10,6 +10,11 @@ A virtual meeting environment using @react-three-fiber and threejs. The goal is 
 - Real-time Communication: Participants can communicate with each other using voice chat, video or text chat, enabling seamless collaboration.
 - Presentation Tools: Coming soon...
 
+## Shortcuts
+`Ctrl+Shift+Z: Mic`
+
+`Ctrl+Shift+X: Video`
+
 ## Getting Started
 
 To create your own instance of virtual meeting, follow these steps:
