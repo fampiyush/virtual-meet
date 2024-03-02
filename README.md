@@ -46,7 +46,7 @@ VITE_PEER_HOST=0.peerjs.com
 
 VITE_BASE_URL=http://localhost:5173
 ```
-
+For creating your own peer server, head over to [peerjs-server](https://github.com/peers/peerjs-server)
 
 ## Contributing
 
