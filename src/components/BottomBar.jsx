@@ -6,13 +6,13 @@ import {
   BsCameraVideoFill,
   BsCameraVideoOffFill,
 } from "react-icons/bs";
-import { LuRadioTower } from "react-icons/lu";
+import { LuScreenShare } from "react-icons/lu"
 import { PlayerContext } from "../helpers/contextProvider";
 import { getMediaStreamAudio, getMediaStreamVideo } from "../helpers/getMedia";
 
 const BottomBar = ({ audioStreamRef, videoStreamRef, setIsOwnVideo }) => {
   const [globalMicButton, setGlobalMicButton] = useState(false);
-  // const [localMic, setLocalMic] = useState(false)
+  // const [screen, setScreen] = useState(false)
   const [videoButton, setVideoButton] = useState(false);
   const [videoDisabled, setVideoDisabled] = useState(false);
   const [audioDisabled, setAudioDisabled] = useState(false);
@@ -139,13 +139,12 @@ const BottomBar = ({ audioStreamRef, videoStreamRef, setIsOwnVideo }) => {
             <p className="text-xs text-[#000] select-none">Global Mic</p>
           </div>
           <div className="px-1 pt-1 rounded">
-            <LuRadioTower
+            <LuScreenShare
               color="#8a93a1"
               size={40}
-              className="ml-[6px]"
               title="Coming Soon"
             />
-            <p className="text-xs text-[#000] select-none">Local Mic</p>
+            <p className="text-xs text-[#000] select-none">Screen</p>
           </div>
           <div
             onClick={videoDisabled ? null : handleVideo}
