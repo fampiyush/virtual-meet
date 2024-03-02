@@ -6,11 +6,14 @@ A virtual meeting environment using @react-three-fiber and threejs. The goal is 
 
 ![virtual-meet-img](/public/virtual-meet.png)
 
+
 ### Features
 
 - 3D Environment: The meeting takes place in a fully interactive 3D environment, allowing participants to navigate and explore the virtual space.
 - Real-time Communication: Participants can communicate with each other using voice chat, video or text chat, enabling seamless collaboration.
 - Presentation Tools: Coming soon...
+
+**This project is still in development, so currently it is missing some features and is not compatible with mobile as of now.**
 
 ## Shortcuts
 `Ctrl+Shift+Z: Mic`
