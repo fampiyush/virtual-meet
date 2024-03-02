@@ -4,6 +4,8 @@ Try on our website - https://meet.piyushg.com
 
 A virtual meeting environment using @react-three-fiber and threejs. The goal is to provide a realistic and immersive experience for participants.
 
+![virtual-meet-img](/public/virtual-meet.png)
+
 ### Features
 
 - 3D Environment: The meeting takes place in a fully interactive 3D environment, allowing participants to navigate and explore the virtual space.
