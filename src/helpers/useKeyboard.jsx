@@ -1,24 +1,24 @@
-import { useEffect, useRef, useContext } from 'react'
-import { PlayerContext } from './contextProvider'
+import { useEffect, useRef, useContext } from "react";
+import { PlayerContext } from "./contextProvider";
 
 export default function useKeyboard() {
-  const keyMap = useRef({})
+  const keyMap = useRef({});
 
-  const { controlsAllowed } = useContext(PlayerContext)
+  const { controlsAllowed } = useContext(PlayerContext);
 
   useEffect(() => {
-    if(controlsAllowed){
+    if (controlsAllowed) {
       const onDocumentKey = (e) => {
-        keyMap.current[e.code] = e.type === 'keydown'
-      }
-      document.addEventListener('keydown', onDocumentKey)
-      document.addEventListener('keyup', onDocumentKey)
+        keyMap.current[e.code] = e.type === "keydown";
+      };
+      document.addEventListener("keydown", onDocumentKey);
+      document.addEventListener("keyup", onDocumentKey);
       return () => {
-        document.removeEventListener('keydown', onDocumentKey)
-        document.removeEventListener('keyup', onDocumentKey)
-      }
+        document.removeEventListener("keydown", onDocumentKey);
+        document.removeEventListener("keyup", onDocumentKey);
+      };
     }
-  }, [controlsAllowed])
+  }, [controlsAllowed]);
 
-  return keyMap.current
+  return keyMap.current;
 }
