@@ -15,9 +15,15 @@ A virtual meeting environment using @react-three-fiber and threejs. The goal is 
 
 **This project is still in development, so currently it is missing some features and is not compatible with mobile as of now.**
 
-## Shortcuts
-`Ctrl+Shift+Z: Mic`
+## Tech Stack
+- ReactJS
+- React-three-fiber, threejs
+- PeerJS
+- Socket.io
+- TailwindCSS
 
+## Shortcuts
+`Ctrl+Shift+Z: Mic`<br>
 `Ctrl+Shift+X: Video`
 
 ## Getting Started
@@ -32,7 +38,7 @@ To create your own instance of virtual meeting, follow these steps:
 5. Open your web browser and navigate to `http://localhost:5173`
 
 ## Backend
-Backend code is on a different repository. Head to the [Github Repository](https://github.com/fampiyush/virtual-meet-backend.git)
+Backend code is on a different repository. Head to the [Backend Repository](https://github.com/fampiyush/virtual-meet-backend.git)
 
 ## Setting up .env file
 ```
