@@ -132,11 +132,6 @@ export const getMediaStreamScreen = (
             "Please allow screen share access from browser to share your screen"
           );
         }
-        if (err.message === "Device in use") {
-          alert(
-            "Screen is already in use, please close all other apps using the screen"
-          );
-        }
         console.log(err);
         resolve(false);
       });
