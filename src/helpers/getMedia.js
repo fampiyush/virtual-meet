@@ -96,6 +96,54 @@ export const getMediaStreamAudio = async (
   return promise;
 };
 
+export const getMediaStreamScreen = (
+  screenStreamRef,
+  playerKeys,
+  peerConn,
+  socket,
+  peer
+) => {
+  const promise = new Promise((resolve) => {
+    navigator.mediaDevices
+      .getDisplayMedia({
+        video: true,
+        audio: true,
+      })
+      .then((stream) => {
+        screenStreamRef.current = stream;
+        Promise.all(
+          peerConn.map(async (conn) => {
+            conn.send({
+              type: "screen",
+              screen: true,
+              socketId: socket.current.id,
+            });
+          })
+        );
+        playerKeys.forEach((key) => {
+          connectToNewUser(key.peerId, stream, peer);
+        });
+        console.log(stream);
+        resolve(true);
+      })
+      .catch((err) => {
+        if (err.message === "Permission denied") {
+          alert(
+            "Please allow screen share access from browser to share your screen"
+          );
+        }
+        if (err.message === "Device in use") {
+          alert(
+            "Screen is already in use, please close all other apps using the screen"
+          );
+        }
+        console.log(err);
+        resolve(false);
+      });
+  });
+  return promise;
+};
+
 export const connectToNewUser = (id, stream, peer) => {
   const call = peer.current.call(id, stream);
 };
