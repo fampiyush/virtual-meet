@@ -16,6 +16,7 @@ import { LoaderBar } from "../helpers/loaders";
 import Info from "./Info";
 import OwnVideo from "./OwnVideo";
 import RightBar from "./RightBar";
+import Screen from './Screen';
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -372,6 +373,7 @@ function MainEngine() {
             <RightBar />
             <Canvas id="canvas" camera={{ position: [0, 0.5, 0.3] }}>
               <Plane />
+              <Screen nodes={nodes} materials={materials} />
               <Stars
                 radius={100}
                 depth={50}

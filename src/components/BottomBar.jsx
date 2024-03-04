@@ -8,7 +8,7 @@ import {
 } from "react-icons/bs";
 import { LuScreenShare } from "react-icons/lu"
 import { PlayerContext } from "../helpers/contextProvider";
-import { getMediaStreamAudio, getMediaStreamVideo } from "../helpers/getMedia";
+import { getMediaStreamAudio, getMediaStreamVideo, getMediaStreamScreen } from "../helpers/getMedia";
 
 const BottomBar = ({ audioStreamRef, videoStreamRef, setIsOwnVideo }) => {
   const [globalMicButton, setGlobalMicButton] = useState(false);
@@ -138,11 +138,11 @@ const BottomBar = ({ audioStreamRef, videoStreamRef, setIsOwnVideo }) => {
             )}
             <p className="text-xs text-[#000] select-none">Global Mic</p>
           </div>
-          <div className="px-1 pt-1 rounded">
+          <div className="px-1 pt-1 rounded hover:bg-white">
             <LuScreenShare
-              color="#8a93a1"
+              color="#5c89d1"
               size={40}
-              title="Coming Soon"
+              title="Share Your Screen"
             />
             <p className="text-xs text-[#000] select-none">Screen</p>
           </div>
