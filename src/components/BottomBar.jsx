@@ -127,6 +127,7 @@ const BottomBar = ({
         track.stop();
       });
       setScreen(false);
+      setScreenShared(false);
       return;
     }
     getMediaStreamScreen(
