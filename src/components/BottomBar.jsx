@@ -6,11 +6,21 @@ import {
   BsCameraVideoFill,
   BsCameraVideoOffFill,
 } from "react-icons/bs";
-import { LuScreenShare } from "react-icons/lu"
+import { LuScreenShare } from "react-icons/lu";
 import { PlayerContext } from "../helpers/contextProvider";
-import { getMediaStreamAudio, getMediaStreamVideo, getMediaStreamScreen } from "../helpers/getMedia";
+import {
+  getMediaStreamAudio,
+  getMediaStreamVideo,
+  getMediaStreamScreen,
+} from "../helpers/getMedia";
 
-const BottomBar = ({ audioStreamRef, videoStreamRef, setIsOwnVideo }) => {
+const BottomBar = ({
+  audioStreamRef,
+  videoStreamRef,
+  screenStreamRef,
+  setIsOwnVideo,
+  setScreen
+}) => {
   const [globalMicButton, setGlobalMicButton] = useState(false);
   // const [screen, setScreen] = useState(false)
   const [videoButton, setVideoButton] = useState(false);
@@ -111,6 +121,25 @@ const BottomBar = ({ audioStreamRef, videoStreamRef, setIsOwnVideo }) => {
     }
   };
 
+  const handleScreen = () => {
+    getMediaStreamScreen(
+      screenStreamRef,
+      playerKeys,
+      peerConn,
+      socket,
+      peer
+    ).then((done) => {
+      if (done) {
+        setScreen(true);
+        screenStreamRef.current.getTracks()[0].onended = () => {
+          setScreen(false);
+        }
+      } else {
+        // setScreen(false)
+      }
+    });
+  };
+
   return (
     <>
       <div className="fixed w-[100%] bottom-2 flex text-center justify-center z-10">
@@ -138,7 +167,10 @@ const BottomBar = ({ audioStreamRef, videoStreamRef, setIsOwnVideo }) => {
             )}
             <p className="text-xs text-[#000] select-none">Global Mic</p>
           </div>
-          <div className="px-1 pt-1 rounded hover:bg-white">
+          <div
+            onClick={handleScreen}
+            className="px-1 pt-1 rounded hover:bg-white"
+          >
             <LuScreenShare
               color="#5c89d1"
               size={40}

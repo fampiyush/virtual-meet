@@ -16,7 +16,7 @@ import { LoaderBar } from "../helpers/loaders";
 import Info from "./Info";
 import OwnVideo from "./OwnVideo";
 import RightBar from "./RightBar";
-import Screen from './Screen';
+import Screen from "./Screen";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -26,12 +26,15 @@ function MainEngine() {
   const [audios, setAudios] = useState({});
   const [audioIcon, setAudioIcon] = useState({});
   const [isOwnVideo, setIsOwnVideo] = useState(false);
+  const [screen, setScreen] = useState(false);
 
   const players = useRef(null);
   const playersRef = useRef(null);
   const videoRef = useRef(null);
   const videoStreamRef = useRef(null);
   const audioStreamRef = useRef(null);
+  const screenStreamRef = useRef(null);
+  const screenShareInfo = useRef(null);
   const povRef = useRef(null);
   const randomPositionX = useRef();
   const randomPositionZ = useRef();
@@ -268,6 +271,8 @@ function MainEngine() {
             }
             sessionStorage.setItem(data.channel, JSON.stringify(curr));
             document.dispatchEvent(new Event("chat"));
+          } else if (data.type === "screen") {
+            screenShareInfo.current = data;
           } else {
             updatePlayers(data);
           }
@@ -289,6 +294,9 @@ function MainEngine() {
         }
         if (videoStreamRef.current) {
           connectToNewUser(data.peerId, videoStreamRef.current, peer);
+        }
+        if (screenStreamRef.current) {
+          connectToNewUser(data.peerId, screenStreamRef.current, peer);
         }
         return [...prev, { socketId: id, peerId: data.peerId }];
       } else {
@@ -366,14 +374,16 @@ function MainEngine() {
             <BottomBar
               audioStreamRef={audioStreamRef}
               videoStreamRef={videoStreamRef}
+              screenStreamRef={screenStreamRef}
               setIsOwnVideo={setIsOwnVideo}
+              setScreen={setScreen}
             />
             <Info />
             <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
             <RightBar />
             <Canvas id="canvas" camera={{ position: [0, 0.5, 0.3] }}>
               <Plane />
-              <Screen nodes={nodes} materials={materials} />
+              <Screen nodes={nodes} materials={materials} screen={screen} screenStreamRef={screenStreamRef} />
               <Stars
                 radius={100}
                 depth={50}

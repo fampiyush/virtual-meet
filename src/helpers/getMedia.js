@@ -106,7 +106,10 @@ export const getMediaStreamScreen = (
   const promise = new Promise((resolve) => {
     navigator.mediaDevices
       .getDisplayMedia({
-        video: true,
+        video: {
+          width: {ideal: 1280, max: 1920},
+          height: {ideal: 720, max: 1080},
+        },
         audio: true,
       })
       .then((stream) => {
@@ -123,7 +126,6 @@ export const getMediaStreamScreen = (
         playerKeys.forEach((key) => {
           connectToNewUser(key.peerId, stream, peer);
         });
-        console.log(stream);
         resolve(true);
       })
       .catch((err) => {
