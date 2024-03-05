@@ -118,7 +118,6 @@ export const getMediaStreamScreen = (
           peerConn.map(async (conn) => {
             conn.send({
               type: "screen",
-              screen: true,
               socketId: socket.current.id,
             });
           })
@@ -129,11 +128,6 @@ export const getMediaStreamScreen = (
         resolve(true);
       })
       .catch((err) => {
-        if (err.message === "Permission denied") {
-          alert(
-            "Please allow screen share access from browser to share your screen"
-          );
-        }
         console.log(err);
         resolve(false);
       });
