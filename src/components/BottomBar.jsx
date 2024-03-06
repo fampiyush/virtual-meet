@@ -128,6 +128,7 @@ const BottomBar = ({
       });
       setScreen(false);
       setScreenShared(false);
+      sendScreenEndSignal();
       return;
     }
     getMediaStreamScreen(
@@ -144,20 +145,23 @@ const BottomBar = ({
             setScreen(false);
             setScreenShared(false);
             screenStreamRef.current = null;
-
-            Promise.all(
-              peerConn.map(async (conn) => {
-                conn.send({
-                  type: "screen",
-                  screen: false,
-                  socketId: socket.current.id,
-                });
-              })
-            );
+            sendScreenEndSignal();
           }
         }
     });
   };
+
+  const sendScreenEndSignal = () => {
+    Promise.all(
+      peerConn.map(async (conn) => {
+        conn.send({
+          type: "screen",
+          screen: false,
+          socketId: socket.current.id,
+        });
+      })
+    );
+  }
 
   return (
     <>

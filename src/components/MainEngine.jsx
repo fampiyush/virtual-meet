@@ -221,6 +221,7 @@ function MainEngine() {
           if (screenStreamRef.current) {
             conn.send({
               type: "screen",
+              screen: true,
               socketId: socket.current.id,
             })
             connectToNewUser(data.peerId, screenStreamRef.current, peer);
