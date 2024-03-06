@@ -20,7 +20,7 @@ import Screen from "./Screen";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
-  const { playerKeys, setPlayerKeys, myName, setPeerConn, peerConn, socket, peer, room } =
+  const { playerKeys, setPlayerKeys, myName, setPeerConn, socket, peer, room } =
     useContext(PlayerContext);
   const [videos, setVideos] = useState({});
   const [audios, setAudios] = useState({});
@@ -110,11 +110,6 @@ function MainEngine() {
               screenStreamRef.current = userStream;
               setScreen(true);
               screenShareInfo.current = null;
-
-              userStream.getVideoTracks()[0].onmute = () => {
-                setScreen(false);
-                screenStreamRef.current = null;
-              }
             }else {
               setVideos((prev) => {
                 return { ...prev, [call.peer]: userStream };
@@ -215,7 +210,12 @@ function MainEngine() {
           sessionStorage.setItem(data.channel, JSON.stringify(curr));
           document.dispatchEvent(new Event("chat"));
         } else if (data.type === "screen") {
-          screenShareInfo.current = data;
+          if(data.screen) {
+            screenShareInfo.current = data;
+          }else {
+            setScreen(false);
+            screenStreamRef.current = null;
+          }
         } else {
           updatePlayers(data);
           if (screenStreamRef.current) {
@@ -292,7 +292,12 @@ function MainEngine() {
             sessionStorage.setItem(data.channel, JSON.stringify(curr));
             document.dispatchEvent(new Event("chat"));
           } else if (data.type === "screen") {
-            screenShareInfo.current = data;
+            if(data.screen) {
+              screenShareInfo.current = data;
+            }else {
+              setScreen(false);
+              screenStreamRef.current = null;
+            }
           } else {
             updatePlayers(data);
           }

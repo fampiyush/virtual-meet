@@ -118,6 +118,7 @@ export const getMediaStreamScreen = (
           peerConn.map(async (conn) => {
             conn.send({
               type: "screen",
+              screen: true,
               socketId: socket.current.id,
             });
           })

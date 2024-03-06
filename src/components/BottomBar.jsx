@@ -144,6 +144,16 @@ const BottomBar = ({
             setScreen(false);
             setScreenShared(false);
             screenStreamRef.current = null;
+
+            Promise.all(
+              peerConn.map(async (conn) => {
+                conn.send({
+                  type: "screen",
+                  screen: false,
+                  socketId: socket.current.id,
+                });
+              })
+            );
           }
         }
     });
