@@ -100,15 +100,14 @@ export const getMediaStreamScreen = (
   screenStreamRef,
   playerKeys,
   peerConn,
-  socket,
   peer
 ) => {
   const promise = new Promise((resolve) => {
     navigator.mediaDevices
       .getDisplayMedia({
         video: {
-          width: {ideal: 1280, max: 1920},
-          height: {ideal: 720, max: 1080},
+          width: { ideal: 1280, max: 1920 },
+          height: { ideal: 720, max: 1080 },
         },
         audio: true,
       })
@@ -119,7 +118,7 @@ export const getMediaStreamScreen = (
             conn.send({
               type: "screen",
               screen: true,
-              socketId: socket.current.id,
+              peerId: peer.current.id,
             });
           })
         );

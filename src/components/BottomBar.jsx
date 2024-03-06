@@ -19,7 +19,7 @@ const BottomBar = ({
   videoStreamRef,
   screenStreamRef,
   setIsOwnVideo,
-  setScreen
+  setScreen,
 }) => {
   const [globalMicButton, setGlobalMicButton] = useState(false);
   const [videoButton, setVideoButton] = useState(false);
@@ -122,7 +122,7 @@ const BottomBar = ({
   };
 
   const handleScreen = () => {
-    if(screenShared) {
+    if (screenShared) {
       screenStreamRef.current.getTracks().forEach((track) => {
         track.stop();
       });
@@ -131,13 +131,8 @@ const BottomBar = ({
       sendScreenEndSignal();
       return;
     }
-    getMediaStreamScreen(
-      screenStreamRef,
-      playerKeys,
-      peerConn,
-      socket,
-      peer
-      ).then((done) => {
+    getMediaStreamScreen(screenStreamRef, playerKeys, peerConn, peer).then(
+      (done) => {
         if (done) {
           setScreen(true);
           setScreenShared(true);
@@ -146,9 +141,10 @@ const BottomBar = ({
             setScreenShared(false);
             screenStreamRef.current = null;
             sendScreenEndSignal();
-          }
+          };
         }
-    });
+      }
+    );
   };
 
   const sendScreenEndSignal = () => {
@@ -161,7 +157,7 @@ const BottomBar = ({
         });
       })
     );
-  }
+  };
 
   return (
     <>

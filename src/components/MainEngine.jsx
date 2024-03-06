@@ -103,18 +103,21 @@ function MainEngine() {
     peer.current.on("call", (call) => {
       call.answer();
       call.on("stream", (userStream) => {
+        if (
+          screenShareInfo.current &&
+          screenShareInfo.current.peerId === call.peer &&
+          !screenStreamRef.current
+        ) {
+          screenStreamRef.current = userStream;
+          setScreen(true);
+          screenShareInfo.current = null;
+        }
         const type = userStream.getTracks()[0];
         if (type.kind === "video") {
           if (!videos[call.peer]) {
-            if(screenShareInfo.current) {
-              screenStreamRef.current = userStream;
-              setScreen(true);
-              screenShareInfo.current = null;
-            }else {
-              setVideos((prev) => {
-                return { ...prev, [call.peer]: userStream };
-              });
-            }
+            setVideos((prev) => {
+              return { ...prev, [call.peer]: userStream };
+            });
           }
         }
 
@@ -210,9 +213,9 @@ function MainEngine() {
           sessionStorage.setItem(data.channel, JSON.stringify(curr));
           document.dispatchEvent(new Event("chat"));
         } else if (data.type === "screen") {
-          if(data.screen) {
+          if (data.screen) {
             screenShareInfo.current = data;
-          }else {
+          } else {
             setScreen(false);
             screenStreamRef.current = null;
           }
@@ -285,9 +288,9 @@ function MainEngine() {
             sessionStorage.setItem(data.channel, JSON.stringify(curr));
             document.dispatchEvent(new Event("chat"));
           } else if (data.type === "screen") {
-            if(data.screen) {
+            if (data.screen) {
               screenShareInfo.current = data;
-            }else {
+            } else {
               setScreen(false);
               screenStreamRef.current = null;
             }
@@ -311,8 +314,8 @@ function MainEngine() {
           conn.send({
             type: "screen",
             screen: true,
-            socketId: socket.current.id,
-          })
+            peerId: peer.current.id,
+          });
           connectToNewUser(data.peerId, screenStreamRef.current, peer);
         }
 
@@ -321,7 +324,7 @@ function MainEngine() {
             type: "audio",
             audio: true,
             socketId: socket.current.id,
-          })
+          });
           connectToNewUser(data.peerId, audioStreamRef.current, peer);
         }
 
@@ -413,7 +416,12 @@ function MainEngine() {
             <RightBar />
             <Canvas id="canvas" camera={{ position: [0, 0.5, 0.3] }}>
               <Plane />
-              <Screen nodes={nodes} materials={materials} screen={screen} screenStreamRef={screenStreamRef} />
+              <Screen
+                nodes={nodes}
+                materials={materials}
+                screen={screen}
+                screenStreamRef={screenStreamRef}
+              />
               <Stars
                 radius={100}
                 depth={50}
