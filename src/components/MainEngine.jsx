@@ -217,15 +217,7 @@ function MainEngine() {
             screenStreamRef.current = null;
           }
         } else {
-          updatePlayers(data);
-          if (screenStreamRef.current) {
-            conn.send({
-              type: "screen",
-              screen: true,
-              socketId: socket.current.id,
-            })
-            connectToNewUser(data.peerId, screenStreamRef.current, peer);
-          }
+          updatePlayers(data, conn);
         }
       });
     });
@@ -300,14 +292,14 @@ function MainEngine() {
               screenStreamRef.current = null;
             }
           } else {
-            updatePlayers(data);
+            updatePlayers(data, conn);
           }
         });
       });
     });
   };
 
-  const updatePlayers = (data) => {
+  const updatePlayers = (data, conn) => {
     const id = data.socketId;
     if (!players.current[id]) {
       players.current = { ...players.current, [id]: { ...data, audio: false } };
@@ -315,9 +307,24 @@ function MainEngine() {
     setPlayerKeys((prev) => {
       const socketIds = prev.map((key) => key.socketId);
       if (!socketIds.includes(id)) {
+        if (screenStreamRef.current) {
+          conn.send({
+            type: "screen",
+            screen: true,
+            socketId: socket.current.id,
+          })
+          connectToNewUser(data.peerId, screenStreamRef.current, peer);
+        }
+
         if (audioStreamRef.current) {
+          conn.send({
+            type: "audio",
+            audio: true,
+            socketId: socket.current.id,
+          })
           connectToNewUser(data.peerId, audioStreamRef.current, peer);
         }
+
         if (videoStreamRef.current) {
           connectToNewUser(data.peerId, videoStreamRef.current, peer);
         }
