@@ -10,6 +10,7 @@ const ContextProvider = ({ children }) => {
   const [peerConn, setPeerConn] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [controlsAllowed, setControlsAllowed] = useState(true);
+  const [screenShared, setScreenShared] = useState(false);
 
   const socket = useRef(null);
   const peer = useRef(null);
@@ -31,6 +32,8 @@ const ContextProvider = ({ children }) => {
         setIsAdmin,
         controlsAllowed,
         setControlsAllowed,
+        setScreenShared,
+        screenShared
       }}
     >
       {children}

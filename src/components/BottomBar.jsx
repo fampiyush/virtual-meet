@@ -26,9 +26,8 @@ const BottomBar = ({
   const [videoDisabled, setVideoDisabled] = useState(false);
   const [audioDisabled, setAudioDisabled] = useState(false);
   const [audioConnecting, setAudioConnecting] = useState(false);
-  const [screenShared, setScreenShared] = useState(false);
 
-  const { peerConn, socket, peer, playerKeys } = useContext(PlayerContext);
+  const { peerConn, socket, peer, playerKeys, screenShared, setScreenShared } = useContext(PlayerContext);
 
   useEffect(() => {
     const onDocumentKey = (e) => {

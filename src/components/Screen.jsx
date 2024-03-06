@@ -1,11 +1,14 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unknown-property */
-import { Suspense } from 'react';
+import { Suspense, useContext } from 'react';
 import { Text, useVideoTexture } from "@react-three/drei";
+import { PlayerContext } from '../helpers/contextProvider';
 const Screen = ({ nodes, materials, screen, screenStreamRef }) => {
 
+  const { screenShared } = useContext(PlayerContext);
+
   const VideoMaterial = ({ src, attach }) => {
-    const texture = useVideoTexture(src);
+    const texture = useVideoTexture(src, {muted: screenShared});
 
     return (
       <meshBasicMaterial map={texture} toneMapped={false} attach={attach} />
