@@ -160,7 +160,7 @@ const BottomBar = ({
 
   return (
     <>
-      <div className="fixed w-[100%] bottom-2 flex text-center justify-center z-10">
+      <div className="fixed w-[100%] bottom-2 flex text-center justify-center z-20">
         <div className="flex min-w-[15%] justify-between bg-gray-300 px-2 rounded">
           <div
             onClick={handleAudio}
@@ -220,7 +220,7 @@ const BottomBar = ({
         </div>
       </div>
       <div
-        className={`fixed w-[100%] top-2 flex justify-center text-center z-10 ${
+        className={`fixed w-[100%] top-2 flex justify-center text-center z-20 ${
           audioConnecting ? "" : "hidden"
         }`}
       >

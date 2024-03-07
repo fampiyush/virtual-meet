@@ -89,7 +89,7 @@ const ChatBox = ({ setBoxes, boxes, setChatDot }) => {
   return (
     <>
       <div
-        className={`fixed bottom-[70px] right-2 z-10 bg-[#5c89d1] rounded w-72 h-[55%] ${
+        className={`fixed bottom-[70px] right-2 z-20 bg-[#5c89d1] rounded w-72 h-[55%] ${
           boxes.chat ? "" : "hidden"
         }`}
       >
@@ -161,7 +161,7 @@ const ChatBox = ({ setBoxes, boxes, setChatDot }) => {
         </div>
       </div>
       {notifications.show && (
-        <div className="fixed bottom-[70px] right-12 z-10 bg-[#5c89d1] rounded w-52 max-h-32 flex flex-col break-words text-center">
+        <div className="fixed bottom-[70px] right-12 z-20 bg-[#5c89d1] rounded w-52 max-h-32 flex flex-col break-words text-center">
           <h1 className="text-lg">New Message</h1>
           <div className="bg-[#445b80] my-2 mx-1 p-1 flex flex-col text-left rounded-lg">
             <span
