@@ -52,13 +52,13 @@ const Info = () => {
     <>
       {!showModal ? (
         <button
-          className="fixed top-2 left-1 z-20 w-[3rem] flex text-center justify-center"
+          className="fixed top-2 left-1 z-10 w-[3rem] flex text-center justify-center"
           onClick={onClick}
         >
           <IoMdInformationCircleOutline size={30} color="#5c89d1" />
         </button>
       ) : (
-        <div className="fixed top-1 left-1 z-20 2xl:max-w-[20%] xl:max-w-[25%] lg:max-w-[30%] md:max-w-[35%] max-w-[55%] p-2 bg-[#5c89d1] rounded flex-col text-center">
+        <div className="fixed top-1 left-1 z-10 2xl:max-w-[20%] xl:max-w-[25%] lg:max-w-[30%] md:max-w-[35%] max-w-[55%] p-2 bg-[#5c89d1] rounded flex-col text-center">
           <div className="absolute right-1 top-1">
             <button
               className="active:opacity-50 hover:bg-gray-400 rounded-full"

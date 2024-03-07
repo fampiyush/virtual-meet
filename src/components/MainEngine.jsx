@@ -17,11 +17,20 @@ import Info from "./Info";
 import OwnVideo from "./OwnVideo";
 import RightBar from "./RightBar";
 import Screen from "./Screen";
+import ScreenFull from "./ScreenFull";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
-  const { playerKeys, setPlayerKeys, myName, setPeerConn, socket, peer, room } =
-    useContext(PlayerContext);
+  const {
+    playerKeys,
+    setPlayerKeys,
+    myName,
+    setPeerConn,
+    socket,
+    peer,
+    room,
+    screenShared,
+  } = useContext(PlayerContext);
   const [videos, setVideos] = useState({});
   const [audios, setAudios] = useState({});
   const [audioIcon, setAudioIcon] = useState({});
@@ -110,22 +119,22 @@ function MainEngine() {
         ) {
           screenStreamRef.current = userStream;
           setScreen(true);
-          screenShareInfo.current = null;
-        }
-        const type = userStream.getTracks()[0];
-        if (type.kind === "video") {
-          if (!videos[call.peer]) {
-            setVideos((prev) => {
-              return { ...prev, [call.peer]: userStream };
-            });
+        }else {
+          const type = userStream.getTracks()[0];
+          if (type.kind === "video") {
+            if (!videos[call.peer]) {
+              setVideos((prev) => {
+                return { ...prev, [call.peer]: userStream };
+              });
+            }
           }
-        }
-
-        if (type.kind === "audio") {
-          if (!audios[call.peer]) {
-            setAudios((prev) => {
-              return { ...prev, [call.peer]: userStream };
-            });
+  
+          if (type.kind === "audio") {
+            if (!audios[call.peer]) {
+              setAudios((prev) => {
+                return { ...prev, [call.peer]: userStream };
+              });
+            }
           }
         }
       });
@@ -217,6 +226,7 @@ function MainEngine() {
             screenShareInfo.current = data;
           } else {
             setScreen(false);
+            screenShareInfo.current = null;
             screenStreamRef.current = null;
           }
         } else {
@@ -414,6 +424,17 @@ function MainEngine() {
             <Info />
             <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
             <RightBar />
+            {players.current && screen && !screenShared && (
+              <ScreenFull
+                screen={screen}
+                screenStreamRef={screenStreamRef}
+                name={
+                  Object.values(players.current).filter(
+                    (obj) => obj.peerId == screenShareInfo.current.peerId
+                  )[0].name
+                }
+              />
+            )}
             <Canvas id="canvas" camera={{ position: [0, 0.5, 0.3] }}>
               <Plane />
               <Screen

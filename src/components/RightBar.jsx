@@ -60,7 +60,7 @@ const RightBar = () => {
           <LoaderSync />
         </div>
       )}
-      <div className="fixed bottom-3 right-2 z-10 flex">
+      <div className="fixed bottom-3 right-2 z-20 flex">
         <button
           onClick={onChat}
           className="bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white"
@@ -96,7 +96,7 @@ const RightBar = () => {
 
       {/* End meeting dialog box */}
       <div
-        className={`fixed bottom-[70px] right-1 z-10 bg-[#5c89d1] rounded min-w-52 ${
+        className={`fixed bottom-[70px] right-1 z-20 bg-[#5c89d1] rounded min-w-52 ${
           boxes.leave ? "" : "hidden"
         }`}
       >
