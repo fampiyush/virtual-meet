@@ -15,6 +15,7 @@ const ContextProvider = ({ children }) => {
   const socket = useRef(null);
   const peer = useRef(null);
   const room = useRef(null);
+  const pointerLockControls = useRef(null);
 
   return (
     <PlayerContext.Provider
@@ -33,7 +34,8 @@ const ContextProvider = ({ children }) => {
         controlsAllowed,
         setControlsAllowed,
         setScreenShared,
-        screenShared
+        screenShared,
+        pointerLockControls,
       }}
     >
       {children}

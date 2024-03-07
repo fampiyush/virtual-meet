@@ -8,7 +8,7 @@ import throttle from "lodash.throttle";
 import * as THREE from "three";
 
 const Pov = ({ socket, povRef, randomPositionX, randomPositionZ }) => {
-  const { peerConn } = useContext(PlayerContext);
+  const { peerConn, pointerLockControls } = useContext(PlayerContext);
 
   povRef.current = useMemo(
     () =>
@@ -75,6 +75,7 @@ const Pov = ({ socket, povRef, randomPositionX, randomPositionZ }) => {
           <PointerLockControls
             selector="#canvas"
             onChange={() => throttleOnChange()}
+            ref={pointerLockControls}
           />
         </>
       )}
