@@ -11,7 +11,7 @@ A virtual meeting environment using @react-three-fiber and threejs. The goal is 
 
 - 3D Environment: The meeting takes place in a fully interactive 3D environment, allowing participants to navigate and explore the virtual space.
 - Real-time Communication: Participants can communicate with each other using voice chat, video or text chat, enabling seamless collaboration.
-- Presentation Tools: Coming soon...
+- Screen Sharing: Participants can share their screens with others, allowing for collaborative presentations and demonstrations.
 
 **This project is still in development, so currently it is missing some features and is not compatible with mobile as of now.**
 
