@@ -76,7 +76,7 @@ const RightBar = () => {
         </button>
         <button className="bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white ml-2">
           <div className="mt-[10px] ml-[0.1rem]">
-            <IoSettings size={30} color="#5c89d1" />
+            <IoSettings size={30} color="#5c89d1" title='Coming Soon' />
           </div>
         </button>
         <button
