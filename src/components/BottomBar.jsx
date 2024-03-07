@@ -20,12 +20,14 @@ const BottomBar = ({
   screenStreamRef,
   setIsOwnVideo,
   setScreen,
+  screen
 }) => {
   const [globalMicButton, setGlobalMicButton] = useState(false);
   const [videoButton, setVideoButton] = useState(false);
   const [videoDisabled, setVideoDisabled] = useState(false);
   const [audioDisabled, setAudioDisabled] = useState(false);
   const [audioConnecting, setAudioConnecting] = useState(false);
+  const [screenSharedNotification, setScreenSharedNotification] = useState(false);
 
   const { peerConn, socket, peer, playerKeys, screenShared, setScreenShared } = useContext(PlayerContext);
 
@@ -129,6 +131,14 @@ const BottomBar = ({
       setScreenShared(false);
       sendScreenEndSignal();
       return;
+    } else if(screen) {
+      if(!screenSharedNotification) {
+        setScreenSharedNotification(true);
+        setTimeout(() => {
+          setScreenSharedNotification(false);
+        }, 1000);
+      }
+      return;
     }
     getMediaStreamScreen(screenStreamRef, playerKeys, peerConn, peer).then(
       (done) => {
@@ -216,6 +226,12 @@ const BottomBar = ({
               />
             )}
             <p className="text-xs text-[#000] select-none">Video</p>
+          </div>
+        </div>
+
+        <div className={`absolute bottom-16 ${screenSharedNotification ? '' : 'hidden'}`}>
+          <div className='bg-[#5c89d1] p-1 rounded'>
+              Someone is already sharing screen
           </div>
         </div>
       </div>

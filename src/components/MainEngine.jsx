@@ -420,6 +420,7 @@ function MainEngine() {
               screenStreamRef={screenStreamRef}
               setIsOwnVideo={setIsOwnVideo}
               setScreen={setScreen}
+              screen={screen}
             />
             <Info />
             <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
