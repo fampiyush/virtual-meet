@@ -106,8 +106,8 @@ export const getMediaStreamScreen = (
     navigator.mediaDevices
       .getDisplayMedia({
         video: {
-          width: { ideal: 1280, max: 1920 },
-          height: { ideal: 720, max: 1080 },
+          width: { max: 1920 },
+          height: { max: 1080 },
         },
         audio: true,
       })
