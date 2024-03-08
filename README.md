@@ -22,7 +22,11 @@ A virtual meeting environment using @react-three-fiber and threejs. The goal is 
 - Socket.io
 - TailwindCSS
 
-## Shortcuts
+## Controls
+`W: Forward`<br>
+`A: Left`<br>
+`S: Backward`<br>
+`D: Right`<br>
 `Ctrl+Shift+Z: Mic`<br>
 `Ctrl+Shift+X: Video`
 
