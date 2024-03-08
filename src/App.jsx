@@ -3,9 +3,16 @@ import JoinForm from "./components/JoinForm";
 import JoinLink from "./components/JoinLink";
 import MainEngine from "./components/MainEngine";
 import { LoaderBar } from "./helpers/loaders";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 const App = () => {
+
+  useEffect(() => {
+    if(window.innerWidth < 768) {
+      alert("This app is not currently supported on mobile devices. Please use a desktop or laptop for the best experience.")
+    }
+  },[])
+
   return (
     <Suspense fallback={<LoaderBar />}>
       <BrowserRouter>
