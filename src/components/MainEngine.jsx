@@ -302,6 +302,7 @@ function MainEngine() {
               screenShareInfo.current = data;
             } else {
               setScreen(false);
+              screenShareInfo.current = null;
               screenStreamRef.current = null;
             }
           } else {

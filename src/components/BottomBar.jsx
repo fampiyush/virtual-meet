@@ -129,6 +129,7 @@ const BottomBar = ({
       });
       setScreen(false);
       setScreenShared(false);
+      screenStreamRef.current = null;
       sendScreenEndSignal();
       return;
     } else if(screen) {
@@ -162,7 +163,7 @@ const BottomBar = ({
         conn.send({
           type: "screen",
           screen: false,
-          socketId: socket.current.id,
+          peerId: peer.current.id
         });
       })
     );
