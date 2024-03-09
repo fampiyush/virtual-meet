@@ -91,7 +91,7 @@ const JoinLink = () => {
 
       <div>
         <a
-          href="https://github.com/fampiyush/"
+          href="https://github.com/fampiyush/virtual-meet"
           target="_blank"
           rel="noreferrer"
         >

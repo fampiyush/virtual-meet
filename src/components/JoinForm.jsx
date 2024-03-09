@@ -182,7 +182,7 @@ const JoinForm = () => {
         </div>
       </div>
 
-      <a href="https://github.com/fampiyush/" target="_blank" rel="noreferrer">
+      <a href="https://github.com/fampiyush/virtual-meet" target="_blank" rel="noreferrer">
         <button className="fixed top-2 right-2 flex bg-[#5c89d1] p-1 rounded hover:scale-105 duration-300">
           <FaGithub size={25} />
           <span className="ml-2 text-lg">Github</span>
