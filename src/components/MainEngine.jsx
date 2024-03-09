@@ -186,52 +186,7 @@ function MainEngine() {
         }
       });
       conn.on("data", (data) => {
-        if (!players.current) {
-          players.current = { [data.socketId]: data };
-        }
-        if (data.type === "audio") {
-          setAudioIcon((prev) => {
-            return { ...prev, [data.socketId]: data.audio };
-          });
-        } else if (data.type === "chat") {
-          let curr = JSON.parse(sessionStorage.getItem(data.channel));
-          if (!curr) {
-            curr = [
-              {
-                id: data.id,
-                name: players.current[data.id].name,
-                message: data.message,
-              },
-            ];
-          } else {
-            if (curr[0].id === data.id) {
-              curr.unshift({
-                id: data.id,
-                name: players.current[data.id].name,
-                message: data.message,
-                prev: true,
-              });
-            } else {
-              curr.unshift({
-                id: data.id,
-                name: players.current[data.id].name,
-                message: data.message,
-              });
-            }
-          }
-          sessionStorage.setItem(data.channel, JSON.stringify(curr));
-          document.dispatchEvent(new Event("chat"));
-        } else if (data.type === "screen") {
-          if (data.screen) {
-            screenShareInfo.current = data;
-          } else {
-            setScreen(false);
-            screenShareInfo.current = null;
-            screenStreamRef.current = null;
-          }
-        } else {
-          updatePlayers(data, conn);
-        }
+        dataChannel(conn, data);
       });
     });
   };
@@ -262,56 +217,60 @@ function MainEngine() {
           setPeerConn((prev) => [...prev, conn]);
         });
         conn.on("data", (data) => {
-          if (!players.current) {
-            players.current = { [data.socketId]: { ...data, audio: false } };
-          }
-          if (data.type === "audio") {
-            setAudioIcon((prev) => {
-              return { ...prev, [data.socketId]: data.audio };
-            });
-          } else if (data.type === "chat") {
-            let curr = JSON.parse(sessionStorage.getItem(data.channel));
-            if (!curr) {
-              curr = [
-                {
-                  id: data.id,
-                  name: players.current[data.id].name,
-                  message: data.message,
-                },
-              ];
-            } else {
-              if (curr[0].id === data.id) {
-                curr.unshift({
-                  id: data.id,
-                  name: players.current[data.id].name,
-                  message: data.message,
-                  prev: true,
-                });
-              } else {
-                curr.unshift({
-                  id: data.id,
-                  name: players.current[data.id].name,
-                  message: data.message,
-                });
-              }
-            }
-            sessionStorage.setItem(data.channel, JSON.stringify(curr));
-            document.dispatchEvent(new Event("chat"));
-          } else if (data.type === "screen") {
-            if (data.screen) {
-              screenShareInfo.current = data;
-            } else {
-              setScreen(false);
-              screenShareInfo.current = null;
-              screenStreamRef.current = null;
-            }
-          } else {
-            updatePlayers(data, conn);
-          }
+          dataChannel(conn, data);
         });
       });
     });
   };
+
+  const dataChannel = (conn, data) => {
+    if (!players.current) {
+      players.current = { [data.socketId]: { ...data, audio: false } };
+    }
+    if (data.type === "audio") {
+      setAudioIcon((prev) => {
+        return { ...prev, [data.socketId]: data.audio };
+      });
+    } else if (data.type === "chat") {
+      let curr = JSON.parse(sessionStorage.getItem(data.channel));
+      if (!curr) {
+        curr = [
+          {
+            id: data.id,
+            name: players.current[data.id].name,
+            message: data.message,
+          },
+        ];
+      } else {
+        if (curr[0].id === data.id) {
+          curr.unshift({
+            id: data.id,
+            name: players.current[data.id].name,
+            message: data.message,
+            prev: true,
+          });
+        } else {
+          curr.unshift({
+            id: data.id,
+            name: players.current[data.id].name,
+            message: data.message,
+          });
+        }
+      }
+      sessionStorage.setItem(data.channel, JSON.stringify(curr));
+      document.dispatchEvent(new Event("chat"));
+    } else if (data.type === "screen") {
+      if (data.screen) {
+        screenShareInfo.current = data;
+      } else {
+        setScreen(false);
+        screenShareInfo.current = null;
+        screenStreamRef.current = null;
+      }
+    } else {
+      updatePlayers(data, conn);
+    }
+  }
 
   const updatePlayers = (data, conn) => {
     const id = data.socketId;
