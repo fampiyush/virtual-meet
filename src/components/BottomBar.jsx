@@ -127,9 +127,6 @@ const BottomBar = ({
       screenStreamRef.current.getTracks().forEach((track) => {
         track.stop();
       });
-      setScreen(false);
-      setScreenShared(false);
-      screenStreamRef.current = null;
       sendScreenEndSignal();
       return;
     } else if(screen) {
@@ -147,9 +144,6 @@ const BottomBar = ({
           setScreen(true);
           setScreenShared(true);
           screenStreamRef.current.getTracks()[0].onended = () => {
-            setScreen(false);
-            setScreenShared(false);
-            screenStreamRef.current = null;
             sendScreenEndSignal();
           };
         }
@@ -158,6 +152,9 @@ const BottomBar = ({
   };
 
   const sendScreenEndSignal = () => {
+    setScreen(false);
+    setScreenShared(false);
+    screenStreamRef.current = null;
     Promise.all(
       peerConn.map(async (conn) => {
         conn.send({
