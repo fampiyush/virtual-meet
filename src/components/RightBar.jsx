@@ -5,6 +5,7 @@ import { PlayerContext } from "../helpers/contextProvider";
 import { IoClose, IoChatboxEllipses, IoSettings } from "react-icons/io5";
 import { LoaderSync } from "../helpers/loaders";
 import ChatBox from "./ChatBox";
+import Settings from './Settings';
 
 const RightBar = () => {
   const [loading, setLoading] = useState(false);
@@ -53,6 +54,10 @@ const RightBar = () => {
     setChatDot(false);
   };
 
+  const onSettings = () => {
+    setBoxes((prev) => ({ chat: false, leave: false, settings: !prev.settings }));
+  }
+
   return (
     <>
       {loading && (
@@ -74,7 +79,7 @@ const RightBar = () => {
             ></div>
           </div>
         </button>
-        <button className="bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white ml-2">
+        <button onClick={onSettings} className="bg-gray-300 px-2 h-12 rounded-[100px] flex justify-center text-center hover:bg-white ml-2">
           <div className="mt-[10px] ml-[0.1rem]">
             <IoSettings size={30} color="#5c89d1" title='Coming Soon' />
           </div>
@@ -92,6 +97,11 @@ const RightBar = () => {
       {/* Chat dialog box */}
       <div>
         <ChatBox setBoxes={setBoxes} boxes={boxes} setChatDot={setChatDot} />
+      </div>
+
+      {/* settings dialog box */}
+      <div>
+        <Settings setBoxes={setBoxes} boxes={boxes} />
       </div>
 
       {/* End meeting dialog box */}
