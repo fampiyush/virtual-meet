@@ -112,31 +112,22 @@ function MainEngine() {
     peer.current.on("call", (call) => {
       call.answer();
       call.on("stream", (userStream) => {
-        if (
-          screenShareInfo.current &&
-          screenShareInfo.current.peerId === call.peer &&
-          !screenStreamRef.current
-        ) {
+        if (call.metadata.type === "screen") {
           screenStreamRef.current = userStream;
           setScreen(true);
-        }else {
-          const type = userStream.getTracks()[0];
-          if (type.kind === "video") {
+        }else if (call.metadata.type === "video") {
             if (!videos[call.peer]) {
               setVideos((prev) => {
                 return { ...prev, [call.peer]: userStream };
               });
             }
-          }
-  
-          if (type.kind === "audio") {
+          }else if (call.metadata.type === "audio") {
             if (!audios[call.peer]) {
               setAudios((prev) => {
                 return { ...prev, [call.peer]: userStream };
               });
             }
           }
-        }
       });
     });
     sendModel(socket.current, {

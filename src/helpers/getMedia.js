@@ -11,7 +11,7 @@ export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
       .then((stream) => {
         videoStreamRef.current = stream;
         playerKeys.forEach((key) => {
-          connectToNewUser(key.peerId, stream, peer);
+          connectToNewUser(key.peerId, stream, peer, "video");
         });
         resolve(true);
       })
@@ -50,7 +50,7 @@ export const getMediaStreamAudio = async (
       .then((stream) => {
         audioStreamRef.current = stream;
         playerKeys.forEach((key) => {
-          connectToNewUser(key.peerId, stream, peer);
+          connectToNewUser(key.peerId, stream, peer, "audio");
         });
         !first
           ? Promise.all(
@@ -123,7 +123,7 @@ export const getMediaStreamScreen = (
           })
         );
         playerKeys.forEach((key) => {
-          connectToNewUser(key.peerId, stream, peer);
+          connectToNewUser(key.peerId, stream, peer, "screen");
         });
         resolve(true);
       })
@@ -135,6 +135,7 @@ export const getMediaStreamScreen = (
   return promise;
 };
 
-export const connectToNewUser = (id, stream, peer) => {
-  const call = peer.current.call(id, stream);
+export const connectToNewUser = (id, stream, peer, type) => {
+  const options = {metadata: {'type': type}}
+  const call = peer.current.call(id, stream, options);
 };
