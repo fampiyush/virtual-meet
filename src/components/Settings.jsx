@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoMdArrowDropright, IoMdArrowDropdown } from "react-icons/io";
+import { FaCheck } from "react-icons/fa6";
 
 const Settings = ({ setBoxes, boxes }) => {
   const [deviceDropDown, setDeviceDropDown] = useState(false);
@@ -7,6 +8,32 @@ const Settings = ({ setBoxes, boxes }) => {
     audio: false,
     video: false,
   });
+  const [audioDevices, setAudioDevices] = useState([]);
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [loading, setLoading] = useState({
+    audio: false,
+    video: false,
+  });
+
+  useEffect(() => {
+    if (deviceSections.audio) {
+      setLoading({ audio: true, video: false });
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        setAudioDevices(
+          devices.filter((device) => device.kind === "audioinput")
+        );
+        setLoading({ audio: false, video: false });
+      });
+    } else if (deviceSections.video) {
+      setLoading({ audio: false, video: true });
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        setVideoDevices(
+          devices.filter((device) => device.kind === "videoinput")
+        );
+        setLoading({ audio: false, video: false });
+      });
+    }
+  }, [deviceSections]);
 
   return (
     <div
@@ -26,17 +53,75 @@ const Settings = ({ setBoxes, boxes }) => {
           {deviceDropDown ? <IoMdArrowDropdown /> : <IoMdArrowDropright />}
         </button>
         <div className={`${deviceDropDown ? "" : "hidden"}`}>
-          <button onClick={() => setDeviceSections((prev) => ({audio: !prev.audio, video: false}))} className="flex items-center mt-1 py-1 px-2 justify-between rounded-lg w-full bg-[#535a6d] hover:bg-[#6f778f] text-sm">
-            Audio Devices
-            {
-                deviceSections.audio ? <IoMdArrowDropdown /> : <IoMdArrowDropright />
+          <button
+            onClick={() =>
+              setDeviceSections((prev) => ({
+                audio: !prev.audio,
+                video: false,
+              }))
             }
+            className="flex items-center mt-1 py-1 px-2 justify-between rounded-lg w-full bg-[#535a6d] hover:bg-[#6f778f] text-sm"
+          >
+            Audio Input Devices
+            {deviceSections.audio ? (
+              <IoMdArrowDropdown />
+            ) : (
+              <IoMdArrowDropright />
+            )}
           </button>
-          <button onClick={() => setDeviceSections((prev) => ({audio: false, video: !prev.video}))} className="flex items-center mt-1 py-1 px-2 justify-between rounded-lg w-full bg-[#535a6d] hover:bg-[#6f778f] text-sm">
-            Video Devices
-            {
-                deviceSections.video ? <IoMdArrowDropdown /> : <IoMdArrowDropright />
+          <button className={`${(deviceSections.audio && !loading.audio) ? "" : "hidden"} w-full p-1`}>
+            {audioDevices.map((device, index) => (
+              <div
+                key={index}
+                className={`flex items-center justify-center bg-[#535a6d] py-1 border hover:bg-[#6f778f] text-xs ${
+                  index === audioDevices.length - 1 ? "rounded-b-lg" : ""
+                } ${index === 0 ? "rounded-t-lg" : ""}`}
+              >
+                <div>{device.label}</div>
+                {index == 0 ? (
+                  <div className="text-xs text-gray-400 mx-1">
+                    <FaCheck color="#39fa73" />
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+            ))}
+          </button>
+          <button
+            onClick={() =>
+              setDeviceSections((prev) => ({
+                audio: false,
+                video: !prev.video,
+              }))
             }
+            className="flex items-center mt-1 py-1 px-2 justify-between rounded-lg w-full bg-[#535a6d] hover:bg-[#6f778f] text-sm"
+          >
+            Video Input Devices
+            {deviceSections.video ? (
+              <IoMdArrowDropdown />
+            ) : (
+              <IoMdArrowDropright />
+            )}
+          </button>
+          <button className={`${(deviceSections.video && !loading.video) ? "" : "hidden"} w-full p-1`}>
+            {videoDevices.map((device, index) => (
+              <div
+                key={index}
+                className={`flex items-center justify-center bg-[#535a6d] py-1 border hover:bg-[#6f778f] text-xs ${
+                  index === videoDevices.length - 1 ? "rounded-b-lg" : ""
+                } ${index === 0 ? "rounded-t-lg" : ""}`}
+              >
+                <div>{device.label}</div>
+                {index == 0 ? (
+                  <div className="text-xs text-gray-400 mx-1">
+                    <FaCheck color="#39fa73" />
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+            ))}
           </button>
         </div>
       </div>
