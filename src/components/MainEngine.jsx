@@ -7,7 +7,7 @@ import { Peer } from "peerjs";
 import * as THREE from "three";
 import { sendModel } from "../helpers/socketConnection";
 import { PlayerContext } from "../helpers/contextProvider";
-import { connectToNewUser } from "../helpers/getMedia";
+import { connectToNewUser, getDefaultDevices } from "../helpers/getMedia";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import PlayerModel from "./PlayerModel";
 import Pov from "./Pov";
@@ -30,6 +30,7 @@ function MainEngine() {
     peer,
     room,
     screenShared,
+    setDevice
   } = useContext(PlayerContext);
   const [videos, setVideos] = useState({});
   const [audios, setAudios] = useState({});
@@ -79,6 +80,9 @@ function MainEngine() {
         randomPositionZ.current = Math.random() * 2 + 2;
         getMedia();
         setLoading(false);
+        getDefaultDevices().then((devices) => {
+          setDevice({audio: devices.audioDevice, video: devices.videoDevice});
+        });
       });
     } catch (error) {
       console.error("Error initializing Peer:", error);
