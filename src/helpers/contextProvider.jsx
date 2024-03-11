@@ -11,6 +11,7 @@ const ContextProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [controlsAllowed, setControlsAllowed] = useState(true);
   const [screenShared, setScreenShared] = useState(false);
+  const [device, setDevice] = useState({ audio: '', video: ''});
 
   const socket = useRef(null);
   const peer = useRef(null);
@@ -36,6 +37,8 @@ const ContextProvider = ({ children }) => {
         setScreenShared,
         screenShared,
         pointerLockControls,
+        device,
+        setDevice
       }}
     >
       {children}

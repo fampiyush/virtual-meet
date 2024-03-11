@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import {
   BsMicFill,
   BsMicMuteFill,
@@ -13,6 +13,7 @@ import {
   getMediaStreamVideo,
   getMediaStreamScreen,
 } from "../helpers/getMedia";
+import { LoaderSync } from '../helpers/loaders';
 
 const BottomBar = ({
   audioStreamRef,
@@ -28,14 +29,15 @@ const BottomBar = ({
   const [audioDisabled, setAudioDisabled] = useState(false);
   const [audioConnecting, setAudioConnecting] = useState(false);
   const [screenSharedNotification, setScreenSharedNotification] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const { peerConn, socket, peer, playerKeys, screenShared, setScreenShared } = useContext(PlayerContext);
+  const { peerConn, socket, peer, playerKeys, screenShared, setScreenShared, device } = useContext(PlayerContext);
 
   useEffect(() => {
     const onDocumentKey = (e) => {
       if (e.ctrlKey && e.shiftKey && e.code === "KeyZ") {
         if (!audioDisabled) {
-          handleAudio();
+          handleAudio(false);
         }
       }
       if (e.ctrlKey && e.shiftKey && e.code === "KeyX") {
@@ -49,6 +51,38 @@ const BottomBar = ({
       document.removeEventListener("keydown", onDocumentKey);
     };
   }, [playerKeys]);
+
+  const currentDevice = useRef();
+
+  useEffect(() => {
+    if(!currentDevice.current) {
+      currentDevice.current = device;
+      return
+    }
+    if(currentDevice.current.audio != device.audio && audioStreamRef.current) {
+      handleAudio(true)
+      setLoading(true);
+      setTimeout(() => {
+        handleAudio()
+        setLoading(false);
+      }, 1000);
+      currentDevice.current.audio = device.audio;
+      return
+    }
+
+    if(currentDevice.current.video != device.video && videoStreamRef.current) {
+      handleVideo()
+      setLoading(true);
+      setTimeout(() => {
+        handleVideo()
+        setLoading(false);
+      }, 2000)
+      currentDevice.current.video = device.video;
+      return
+    }
+
+    currentDevice.current = device;
+  },[device])
 
   const handleVideo = () => {
     setVideoDisabled(true);
@@ -67,7 +101,7 @@ const BottomBar = ({
       setIsOwnVideo(false);
       return;
     } else if (!videoStreamRef.current) {
-      getMediaStreamVideo(videoStreamRef, playerKeys, peer).then((done) => {
+      getMediaStreamVideo(videoStreamRef, playerKeys, peer, device.video).then((done) => {
         if (done) {
           setVideoButton(true);
           setIsOwnVideo(true);
@@ -79,27 +113,38 @@ const BottomBar = ({
     }
   };
 
-  const handleAudio = async () => {
+  const handleAudio = async (deviceChange) => {
     if (audioStreamRef.current) {
       setGlobalMicButton((prev) => !prev);
-      audioStreamRef.current.getTracks().forEach((track) => {
-        if (track.kind === "audio") {
-          track.enabled = !track.enabled;
-        }
+      if(!deviceChange) {
+        audioStreamRef.current.getTracks().forEach((track) => {
+          if (track.kind === "audio") {
+            track.enabled = !track.enabled;
+          }
+          Promise.all(
+            peerConn.map(async (conn) => {
+              conn.send({
+                type: "audio",
+                audio: track.enabled,
+                socketId: socket.current.id,
+              });
+            })
+          );
+        });
+      } else {
+        audioStreamRef.current.getAudioTracks()[0].stop();
+        audioStreamRef.current = null;
         Promise.all(
           peerConn.map(async (conn) => {
             conn.send({
               type: "audio",
-              audio: track.enabled,
+              audio: false,
               socketId: socket.current.id,
             });
           })
         );
-      });
-      return;
-    }
-
-    if (!audioStreamRef.current) {
+      }
+    }else if (!audioStreamRef.current) {
       setAudioConnecting(true);
       setAudioDisabled(true);
       getMediaStreamAudio(
@@ -107,7 +152,8 @@ const BottomBar = ({
         playerKeys,
         peerConn,
         socket,
-        peer
+        peer,
+        device.audio
       ).then((done) => {
         if (done) {
           setGlobalMicButton(true);
@@ -168,10 +214,11 @@ const BottomBar = ({
 
   return (
     <>
+    {loading && <LoaderSync />}
       <div className="fixed w-[100%] bottom-2 flex text-center justify-center z-20">
         <div className="flex min-w-[15%] justify-between bg-gray-300 px-2 rounded">
           <div
-            onClick={handleAudio}
+            onClick={() => handleAudio(false)}
             className={`px-1 pt-1 hover:bg-white rounded ${
               audioDisabled ? "disabled opacity-50" : ""
             }`}

@@ -1,10 +1,11 @@
-export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer) => {
+export const getMediaStreamVideo = (videoStreamRef, playerKeys, peer, deviceId) => {
   const promise = new Promise((resolve) => {
     navigator.mediaDevices
       .getUserMedia({
         video: {
           width: { max: 640 },
           height: { max: 480 },
+          deviceId: deviceId,
         },
         audio: false,
       })
@@ -39,43 +40,28 @@ export const getMediaStreamAudio = async (
   peerConn,
   socket,
   peer,
-  first
+  deviceId
 ) => {
   const promise = new Promise((resolve) => {
     navigator.mediaDevices
       .getUserMedia({
         video: false,
-        audio: true,
+        audio: {deviceId: deviceId},
       })
       .then((stream) => {
         audioStreamRef.current = stream;
         playerKeys.forEach((key) => {
           connectToNewUser(key.peerId, stream, peer, "audio");
         });
-        !first
-          ? Promise.all(
-              peerConn.map(async (conn) => {
-                conn.send({
-                  type: "audio",
-                  audio: true,
-                  socketId: socket.current.id,
-                });
-              })
-            )
-          : audioStreamRef.current.getTracks().forEach((track) => {
-              if (track.kind === "audio") {
-                track.enabled = false;
-                Promise.all(
-                  peerConn.map(async (conn) => {
-                    conn.send({
-                      type: "audio",
-                      audio: false,
-                      socketId: socket.current.id,
-                    });
-                  })
-                );
-              }
+        Promise.all(
+          peerConn.map(async (conn) => {
+            conn.send({
+              type: "audio",
+              audio: true,
+              socketId: socket.current.id,
             });
+          })
+        )
         resolve(true);
       })
       .catch((err) => {
@@ -139,3 +125,10 @@ export const connectToNewUser = (id, stream, peer, type) => {
   const options = {metadata: {'type': type}}
   const call = peer.current.call(id, stream, options);
 };
+
+export const getDefaultDevices = async() => {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const audioDevices = devices.filter((device) => device.kind === "audioinput");
+  const videoDevices = devices.filter((device) => device.kind === "videoinput");
+  return { audioDevice: audioDevices[0].deviceId, videoDevice: videoDevices[0].deviceId };
+}
