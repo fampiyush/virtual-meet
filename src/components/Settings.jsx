@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { PlayerContext } from '../helpers/contextProvider';
 import { IoMdArrowDropright, IoMdArrowDropdown } from "react-icons/io";
 import { FaCheck } from "react-icons/fa6";
+import { IoClose } from "react-icons/io5";
 
 const Settings = ({ setBoxes, boxes }) => {
   const [deviceDropDown, setDeviceDropDown] = useState(false);
@@ -45,7 +46,11 @@ const Settings = ({ setBoxes, boxes }) => {
     >
       <div className="flex justify-center border-b-2 rounded">
         <div>Settings</div>
+
       </div>
+      <button className='absolute right-0 rounded-full hover:bg-gray-400' onClick={() => setBoxes({ ...boxes, settings: false })}>
+        <IoClose size={23} />
+      </button>
       <div className="mt-1 flex-col text-center flex-1 overflow-y-scroll no-scrollbar">
         <button
           onClick={() => setDeviceDropDown(!deviceDropDown)}
