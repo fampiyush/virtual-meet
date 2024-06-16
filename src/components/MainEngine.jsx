@@ -18,6 +18,7 @@ import OwnVideo from "./OwnVideo";
 import RightBar from "./RightBar";
 import Screen from "./Screen";
 import ScreenFull from "./ScreenFull";
+import Notification from './Notification';
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,10 @@ function MainEngine() {
   const [audioIcon, setAudioIcon] = useState({});
   const [isOwnVideo, setIsOwnVideo] = useState(false);
   const [screen, setScreen] = useState(false);
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+  });
 
   const players = useRef(null);
   const playersRef = useRef(null);
@@ -181,6 +186,15 @@ function MainEngine() {
         }
       });
       conn.on("data", (data) => {
+        if(!players.current || !players.current[data.socketId]){
+          setNotification({
+            show: true,
+            message: `${data.name} joined the meeting`,
+          })
+          setTimeout(() => {
+            setNotification({ show: false, message: "" });
+          }, 3000);
+        }
         dataChannel(conn, data);
       });
     });
@@ -324,7 +338,17 @@ function MainEngine() {
       setPlayerKeys((prev) => {
         return prev.filter((key) => key.socketId !== id);
       });
-      players.current[id] = null;
+
+      // Notification
+      setNotification({
+        show: true,
+        message: `${players.current[id].name} left the meeting`,
+      })
+      setTimeout(() => {
+        setNotification({ show: false, message: "" });
+      }, 3000);
+
+      delete players.current[id]
       if (playersRef.current) {
         const currPlayer = playersRef.current.get(id);
         if (currPlayer) {
@@ -380,6 +404,7 @@ function MainEngine() {
             <Info />
             <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
             <RightBar />
+            <Notification message={notification.message} show={notification.show} />
             {players.current && screen && !screenShared && (
               <ScreenFull
                 screen={screen}
