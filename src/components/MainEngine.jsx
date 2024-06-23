@@ -69,11 +69,14 @@ function MainEngine() {
   const placeHolder = useLoader(THREE.TextureLoader, "/placeholder.jpg");
 
   useEffect(() => {
+    // If the socket is not initialized, redirect to the home page
     if (!socket.current) {
       navigate(`/${meetingId}`);
       return;
     }
     sessionStorage.clear();
+
+    // Initialize the peer connection
     try {
       const peerConnection = new Peer({
         host: import.meta.env.VITE_PEER_HOST,
@@ -117,6 +120,7 @@ function MainEngine() {
     );
   };
 
+  // When the peer connection is established, setup call
   const getMedia = () => {
     peer.current.on("call", (call) => {
       call.answer();
@@ -232,6 +236,7 @@ function MainEngine() {
     });
   };
 
+  // Updates various states based on the data received from the data channel
   const dataChannel = (conn, data) => {
     if (!players.current) {
       players.current = { [data.socketId]: { ...data, audio: false } };
