@@ -19,23 +19,49 @@ const Settings = ({ setBoxes, boxes }) => {
   const { device, setDevice } = useContext(PlayerContext);
 
   useEffect(() => {
-    if (deviceSections.audio) {
-      setLoading({ audio: true, video: false });
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        setAudioDevices(
-          devices.filter((device) => (device.kind === "audioinput" && !device.label.includes("Communications")))
-        );
-        setLoading({ audio: false, video: false });
-      });
-    } else if (deviceSections.video) {
-      setLoading({ audio: false, video: true });
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        setVideoDevices(
-          devices.filter((device) => device.kind === "videoinput")
-        );
-        setLoading({ audio: false, video: false });
-      });
+
+    const check = async () => {
+      if (deviceSections.audio) {
+        const audioPermission = await navigator.permissions.query({ name: 'microphone' });
+        if (audioPermission.state === 'prompt') {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach((track) => track.stop());
+        }else if (audioPermission.state === 'denied') {
+          alert(
+            "Please allow microphone access from browser to see all audio devices."
+          );
+          setDeviceSections({ ...deviceSections, audio: false });
+          return;
+        }
+        setLoading({ audio: true, video: false });
+        navigator.mediaDevices.enumerateDevices().then((devices) => {
+          setAudioDevices(
+            devices.filter((device) => (device.kind === "audioinput" && !device.label.includes("Communications")))
+          );
+          setLoading({ audio: false, video: false });
+        });
+      } else if (deviceSections.video) {
+        const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+        if (cameraPermission.state === 'prompt') {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          stream.getTracks().forEach((track) => track.stop());
+        }else if (cameraPermission.state === 'denied') {
+          alert(
+            "Please allow camera access from browser to see all video devices."
+          );
+        }
+        setLoading({ audio: false, video: true });
+        navigator.mediaDevices.enumerateDevices().then((devices) => {
+          setVideoDevices(
+            devices.filter((device) => device.kind === "videoinput")
+          );
+          setLoading({ audio: false, video: false });
+        });
+      }
     }
+
+    check();
+
   }, [deviceSections]);
 
   return (
