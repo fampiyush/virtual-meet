@@ -88,6 +88,7 @@ function MainEngine() {
         randomPositionZ.current = Math.random() * 2 + 2;
         getMedia();
         setLoading(false);
+        startNotification();
         getDefaultDevices().then((devices) => {
           setDevice({audio: devices.audioDevice, video: devices.videoDevice});
         });
@@ -391,6 +392,17 @@ function MainEngine() {
         navigate("/", { replace: true, state: { fromAdmin: true } });
       }, 1000);
     });
+  };
+
+  //Instruction on start
+  const startNotification = () => {
+    setNotification({
+      show: true,
+      message: "Use W, A, S, D to move around",
+    });
+    setTimeout(() => {
+      setNotification({ show: false, message: "" });
+    }, 10000);
   };
 
   return (
