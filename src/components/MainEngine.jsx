@@ -191,7 +191,7 @@ function MainEngine() {
         }
       });
       conn.on("data", (data) => {
-        if(!players.current || !players.current[data.socketId]){
+        if(data.socketId && (!players.current || !players.current[data.socketId])){
           setNotification({
             show: true,
             message: `${data.name} joined the meeting`,
