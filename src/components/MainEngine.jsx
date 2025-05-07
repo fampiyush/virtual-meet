@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useRef, useState, useContext, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Canvas, useLoader, useThree } from "@react-three/fiber";
+import { Canvas, useLoader } from "@react-three/fiber";
 import { Stats, Stars } from "@react-three/drei";
 import { Peer } from "peerjs";
 import * as THREE from "three";
@@ -20,6 +20,7 @@ import Screen from "./Screen";
 import ScreenFull from "./ScreenFull";
 import Notification from './Notification';
 import Plane from "./Plane";
+import WithLoader from "./WithLoader";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -388,7 +389,8 @@ function MainEngine() {
   return (
     <Suspense fallback={<LoaderBar />}>
       <div className="h-screen w-screen">
-        {!loading ? (
+        {/* Render loader conditionally based on `loading` state */}
+        <WithLoader isLoading={loading}>
           <>
             <BottomBar
               audioStreamRef={audioStreamRef}
@@ -463,9 +465,7 @@ function MainEngine() {
             </Canvas>
             {/* <Stats className='flex justify-end right-0 pointer-events-none z-50' /> */}
           </>
-        ) : (
-          <LoaderBar />
-        )}
+        </WithLoader>
       </div>
     </Suspense>
   );
