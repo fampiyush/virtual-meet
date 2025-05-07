@@ -82,7 +82,7 @@ function MainEngine() {
         randomPositionZ.current = Math.random() * 2 + 2;
         getMedia();
         setLoading(false);
-        startNotification();
+        triggerMessagePopup("Use W, A, S, D to move around", 10000);
         getDefaultDevices().then((devices) => {
           setDevice({audio: devices.audioDevice, video: devices.videoDevice});
         });
@@ -165,13 +165,7 @@ function MainEngine() {
       });
       conn.on("data", (data) => {
         if(data.socketId && (!players.current || !players.current[data.socketId])){
-          setNotification({
-            show: true,
-            message: `${data.name} joined the meeting`,
-          })
-          setTimeout(() => {
-            setNotification({ show: false, message: "" });
-          }, 3000);
+          triggerMessagePopup(`${data.name} joined the meeting`, 3000);
         }
         dataChannel(conn, data);
       });
@@ -368,15 +362,12 @@ function MainEngine() {
     });
   };
 
-  //Instruction on start
-  const startNotification = () => {
-    setNotification({
-      show: true,
-      message: "Use W, A, S, D to move around",
-    });
+  const triggerMessagePopup = (message, duration) => {
+    setNotification({ show: true, message: message });
+
     setTimeout(() => {
       setNotification({ show: false, message: "" });
-    }, 10000);
+    }, duration);
   };
 
   return (
