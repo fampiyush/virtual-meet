@@ -314,15 +314,16 @@ function MainEngine() {
   const onDisconnect = () => {
     socket.current.on("user-disconnected", (player) => {
       const id = player.socketId;
+      setNotification({
+        show: true,
+        message: `${players.current[id].name} left the meeting`,
+      });
+
       setPlayerKeys((prev) => {
         return prev.filter((key) => key.socketId !== id);
       });
 
       // Notification
-      setNotification({
-        show: true,
-        message: `${players.current[id].name} left the meeting`,
-      })
       setTimeout(() => {
         setNotification({ show: false, message: "" });
       }, 3000);
@@ -394,7 +395,7 @@ function MainEngine() {
               isOwnVideo={isOwnVideo}
               message={notification.message}
               show={notification.show}
-              players={players.current}
+              players={players}
               screenShared={screenShared}
               screenShareInfo={screenShareInfo}
             />
@@ -403,7 +404,7 @@ function MainEngine() {
               materials={materials}
               screen={screen}
               screenStreamRef={screenStreamRef}
-              socket={socket.current}
+              socket={socket}
               peer={peer.current}
               randomPositionX={randomPositionX.current}
               randomPositionZ={randomPositionZ.current}
@@ -413,7 +414,7 @@ function MainEngine() {
               videos={videos}
               audios={audios}
               placeHolder={placeHolder}
-              players={players.current}
+              players={players}
               playerKeys={playerKeys}
             />
             {/* <Stats className='flex justify-end right-0 pointer-events-none z-50' /> */}

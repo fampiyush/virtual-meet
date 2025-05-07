@@ -19,7 +19,7 @@ const MeetingInterface = ({
   screenShared,
   screenShareInfo,
 }) => {
-  const shouldShowScreenFull = players && screen && !screenShared;
+  const shouldShowScreenFull = players.current && screen && !screenShared;
 
   const getScreenSharerName = () => {
     return Object.values(players.current).filter(

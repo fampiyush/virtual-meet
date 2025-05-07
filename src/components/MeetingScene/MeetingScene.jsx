@@ -55,12 +55,12 @@ const MeetingScene = ({
             <PlayerModel
               refe={key.socketId}
               key={key.socketId}
-              position={players[key.socketId].position}
-              rotation={players[key.socketId].rotation}
+              position={players.current[key.socketId].position}
+              rotation={players.current[key.socketId].rotation}
               getMap={getMap}
               video={videos ? videos[key.peerId] : null}
               audio={audios ? audios[key.peerId] : null}
-              name={players[key.socketId].name}
+              name={players.current[key.socketId].name}
               povRef={povRef}
               audioIcon={audioIcon[key.socketId]}
               nodes={nodes}
