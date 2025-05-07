@@ -10,6 +10,7 @@ import WithLoader from "./WithLoader";
 import MeetingInterface from "./MeetingInterface/MeetingInterface";
 import MeetingScene from "./MeetingScene/MeetingScene";
 import usePeerConnection from "../helpers/usePeerConnection";
+import useSetupSocketEvents from "../helpers/useSetupSocketEvents";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,6 @@ function MainEngine() {
     peer,
     room,
     screenShared,
-    setDevice
   } = useContext(PlayerContext);
   const [videos, setVideos] = useState({});
   const [audios, setAudios] = useState({});
@@ -70,19 +70,19 @@ function MainEngine() {
         if (call.metadata.type === "screen") {
           screenStreamRef.current = userStream;
           setScreen(true);
-        }else if (call.metadata.type === "video") {
-            if (!videos[call.peer]) {
-              setVideos((prev) => {
-                return { ...prev, [call.peer]: userStream };
-              });
-            }
-          }else if (call.metadata.type === "audio") {
-            if (!audios[call.peer]) {
-              setAudios((prev) => {
-                return { ...prev, [call.peer]: userStream };
-              });
-            }
+        } else if (call.metadata.type === "video") {
+          if (!videos[call.peer]) {
+            setVideos((prev) => {
+              return { ...prev, [call.peer]: userStream };
+            });
           }
+        } else if (call.metadata.type === "audio") {
+          if (!audios[call.peer]) {
+            setAudios((prev) => {
+              return { ...prev, [call.peer]: userStream };
+            });
+          }
+        }
       });
     });
     sendModel(socket.current, {
@@ -90,9 +90,8 @@ function MainEngine() {
       room: room.current,
       name: myName,
     });
-    getPlayers();
-    onDisconnect();
-    onMeetingEnd();
+
+    setupSocket();
 
     peer.current.on("connection", (conn) => {
       conn.on("open", () => {
@@ -132,42 +131,13 @@ function MainEngine() {
         }
       });
       conn.on("data", (data) => {
-        if(data.socketId && (!players.current || !players.current[data.socketId])){
+        if (
+          data.socketId &&
+          (!players.current || !players.current[data.socketId])
+        ) {
           triggerMessagePopup(`${data.name} joined the meeting`, 3000);
         }
         dataChannel(conn, data);
-      });
-    });
-  };
-
-  const getPlayers = () => {
-    socket.current.emit("get-all-users");
-    socket.current.on("all-users", (player) => {
-      const keys = Object.entries(player).map(([key, value]) => ({
-        socketId: key,
-        peerId: value.peerId,
-      }));
-
-      keys.forEach((key) => {
-        const conn = peer.current.connect(key.peerId);
-        conn.on("open", () => {
-          conn.send({
-            position: {
-              x: randomPositionX.current,
-              y: 0.2,
-              z: randomPositionZ.current,
-            },
-            rotation: { _x: 0, _y: 0, _z: 0 },
-            socketId: socket.current.id,
-            peerId: peer.current.id,
-            room: room.current,
-            name: myName,
-          });
-          setPeerConn((prev) => [...prev, conn]);
-        });
-        conn.on("data", (data) => {
-          dataChannel(conn, data);
-        });
       });
     });
   };
@@ -220,7 +190,7 @@ function MainEngine() {
     } else {
       updatePlayers(data, conn);
     }
-  }
+  };
 
   const updatePlayers = (data, conn) => {
     const id = data.socketId;
@@ -273,58 +243,26 @@ function MainEngine() {
     }
   };
 
-  const onDisconnect = () => {
-    socket.current.on("user-disconnected", (player) => {
-      const id = player.socketId;
+  const { setupSocket } = useSetupSocketEvents(
+    socket,
+    peer,
+    room,
+    myName,
+    randomPositionX,
+    randomPositionZ,
+    setPeerConn,
+    setPlayerKeys,
+    setLoading,
+    navigate,
+    triggerMessagePopup,
+    dataChannel,
+    players,
+    playersRef,
+    videos,
+    videoRef
+  );
 
-      // Notification
-      triggerMessagePopup(`${players.current[id].name} left the meeting`, 3000)
-
-      setPlayerKeys((prev) => {
-        return prev.filter((key) => key.socketId !== id);
-      });
-
-      delete players.current[id]
-      if (playersRef.current) {
-        const currPlayer = playersRef.current.get(id);
-        if (currPlayer) {
-          playersRef.current.delete(id);
-        }
-      }
-      const peerId = player.peerId;
-      videos[peerId] = null;
-      if (videoRef.current) {
-        const currVideo = videoRef.current.get(peerId);
-        if (currVideo) {
-          videoRef.current.delete(peerId);
-        }
-      }
-      setPeerConn((prev) => {
-        const conn = prev.find((conn) => conn.peer === peerId);
-        if (conn) {
-          conn.close();
-          return prev.filter((conn) => conn.peer !== peerId);
-        } else {
-          return prev;
-        }
-      });
-    });
-  };
-
-  const onMeetingEnd = () => {
-    socket.current.on("admin-ended-call", () => {
-      socket.current.disconnect();
-      peer.current.destroy();
-      setPlayerKeys([]);
-      setPeerConn([]);
-      setLoading(true);
-      setTimeout(() => {
-        navigate("/", { replace: true, state: { fromAdmin: true } });
-      }, 1000);
-    });
-  };
-
-  usePeerConnection(getMedia, setLoading, triggerMessagePopup)
+  usePeerConnection(getMedia, setLoading, triggerMessagePopup);
 
   return (
     <Suspense fallback={<LoaderBar />}>
@@ -332,6 +270,7 @@ function MainEngine() {
         {/* Render loader conditionally based on `loading` state */}
         <WithLoader isLoading={loading}>
           <>
+            {/* Meeting interface for controls and notifications (audio/video/screen sharing UI) */}
             <MeetingInterface
               audioStreamRef={audioStreamRef}
               videoStreamRef={videoStreamRef}
@@ -346,6 +285,7 @@ function MainEngine() {
               screenShared={screenShared}
               screenShareInfo={screenShareInfo}
             />
+            {/* 3D scene rendering with player avatars (built with Three.js) */}
             <MeetingScene
               screen={screen}
               screenStreamRef={screenStreamRef}
