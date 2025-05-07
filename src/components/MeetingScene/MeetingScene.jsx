@@ -1,13 +1,13 @@
 import { Stars } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useLoader } from "@react-three/fiber";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import * as THREE from "three";
 import Plane from "./Plane";
 import Screen from "./Screen";
 import Pov from "./Pov";
 import PlayerModel from "./PlayerModel";
 
 const MeetingScene = ({
-  nodes,
-  materials,
   screen,
   screenStreamRef,
   socket,
@@ -19,10 +19,14 @@ const MeetingScene = ({
   audioIcon,
   videos,
   audios,
-  placeHolder,
   players,
   playerKeys,
 }) => {
+
+  const { nodes, materials } = useLoader(GLTFLoader, "/television.glb");
+
+  const placeHolder = useLoader(THREE.TextureLoader, "/placeholder.jpg");
+
   return (
     <Canvas id="canvas" camera={{ position: [0, 0.5, 0.3] }}>
       <Plane />
