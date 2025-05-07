@@ -19,6 +19,7 @@ import RightBar from "./RightBar";
 import Screen from "./Screen";
 import ScreenFull from "./ScreenFull";
 import Notification from './Notification';
+import Plane from "./Plane";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -99,27 +100,6 @@ function MainEngine() {
       navigate("/");
     }
   }, []);
-
-  const Plane = () => {
-    const { gl } = useThree();
-
-    useEffect(() => {
-      const closeContext = () => {
-        if (gl) {
-          gl.dispose();
-        }
-      };
-
-      return closeContext;
-    }, []);
-
-    return (
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[20, 20]} />
-        <meshBasicMaterial side={THREE.DoubleSide} />
-      </mesh>
-    );
-  };
 
   // When the peer connection is established, setup call
   const getMedia = () => {
