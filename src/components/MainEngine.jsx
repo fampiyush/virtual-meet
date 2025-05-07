@@ -1,21 +1,18 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useRef, useState, useContext, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Canvas, useLoader } from "@react-three/fiber";
-import { Stats, Stars } from "@react-three/drei";
+import { useLoader } from "@react-three/fiber";
+import { Stats } from "@react-three/drei";
 import { Peer } from "peerjs";
 import * as THREE from "three";
 import { sendModel } from "../helpers/socketConnection";
 import { PlayerContext } from "../helpers/contextProvider";
 import { connectToNewUser, getDefaultDevices } from "../helpers/getMedia";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import PlayerModel from "./PlayerModel";
-import Pov from "./Pov";
 import { LoaderBar } from "../helpers/loaders";
-import Screen from "./Screen";
-import Plane from "./Plane";
 import WithLoader from "./WithLoader";
 import MeetingInterface from "./MeetingInterface/MeetingInterface";
+import MeetingScene from "./MeetingScene/MeetingScene";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -401,54 +398,24 @@ function MainEngine() {
               screenShared={screenShared}
               screenShareInfo={screenShareInfo}
             />
-            <Canvas id="canvas" camera={{ position: [0, 0.5, 0.3] }}>
-              <Plane />
-              <Screen
-                nodes={nodes}
-                materials={materials}
-                screen={screen}
-                screenStreamRef={screenStreamRef}
-              />
-              <Stars
-                radius={100}
-                depth={50}
-                count={5000}
-                factor={4}
-                saturation={0}
-                fade
-                speed={1}
-              />
-              {socket.current && peer.current && (
-                <Pov
-                  socket={socket}
-                  povRef={povRef}
-                  randomPositionX={randomPositionX.current}
-                  randomPositionZ={randomPositionZ.current}
-                />
-              )}
-              {playerKeys &&
-                playerKeys.map((key) => {
-                  return (
-                    <PlayerModel
-                      refe={key.socketId}
-                      key={key.socketId}
-                      position={players.current[key.socketId].position}
-                      rotation={players.current[key.socketId].rotation}
-                      getMap={getMap}
-                      video={videos ? videos[key.peerId] : null}
-                      audio={audios ? audios[key.peerId] : null}
-                      name={players.current[key.socketId].name}
-                      povRef={povRef}
-                      audioIcon={audioIcon[key.socketId]}
-                      nodes={nodes}
-                      materials={materials}
-                      videos={videos}
-                      placeHolder={placeHolder}
-                    />
-                  );
-                })}
-              <gridHelper args={[20, 20]} />
-            </Canvas>
+            <MeetingScene
+              nodes={nodes}
+              materials={materials}
+              screen={screen}
+              screenStreamRef={screenStreamRef}
+              socket={socket.current}
+              peer={peer.current}
+              randomPositionX={randomPositionX.current}
+              randomPositionZ={randomPositionZ.current}
+              getMap={getMap}
+              povRef={povRef}
+              audioIcon={audioIcon}
+              videos={videos}
+              audios={audios}
+              placeHolder={placeHolder}
+              players={players.current}
+              playerKeys={playerKeys}
+            />
             {/* <Stats className='flex justify-end right-0 pointer-events-none z-50' /> */}
           </>
         </WithLoader>

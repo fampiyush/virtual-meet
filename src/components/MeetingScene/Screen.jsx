@@ -2,7 +2,7 @@
 /* eslint-disable react/no-unknown-property */
 import { Suspense, useContext } from 'react';
 import { Text, useVideoTexture } from "@react-three/drei";
-import { PlayerContext } from '../helpers/contextProvider';
+import { PlayerContext } from '../../helpers/contextProvider';
 const Screen = ({ nodes, materials, screen, screenStreamRef }) => {
 
   const { screenShared } = useContext(PlayerContext);
