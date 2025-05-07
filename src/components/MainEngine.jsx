@@ -11,16 +11,11 @@ import { connectToNewUser, getDefaultDevices } from "../helpers/getMedia";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import PlayerModel from "./PlayerModel";
 import Pov from "./Pov";
-import BottomBar from "./BottomBar";
 import { LoaderBar } from "../helpers/loaders";
-import Info from "./Info";
-import OwnVideo from "./OwnVideo";
-import RightBar from "./RightBar";
 import Screen from "./Screen";
-import ScreenFull from "./ScreenFull";
-import Notification from './Notification';
 import Plane from "./Plane";
 import WithLoader from "./WithLoader";
+import MeetingInterface from "./MeetingInterface/MeetingInterface";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -392,29 +387,20 @@ function MainEngine() {
         {/* Render loader conditionally based on `loading` state */}
         <WithLoader isLoading={loading}>
           <>
-            <BottomBar
+            <MeetingInterface
               audioStreamRef={audioStreamRef}
               videoStreamRef={videoStreamRef}
               screenStreamRef={screenStreamRef}
               setIsOwnVideo={setIsOwnVideo}
               setScreen={setScreen}
               screen={screen}
+              isOwnVideo={isOwnVideo}
+              message={notification.message}
+              show={notification.show}
+              players={players.current}
+              screenShared={screenShared}
+              screenShareInfo={screenShareInfo}
             />
-            <Info />
-            <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
-            <RightBar />
-            <Notification message={notification.message} show={notification.show} />
-            {players.current && screen && !screenShared && (
-              <ScreenFull
-                screen={screen}
-                screenStreamRef={screenStreamRef}
-                name={
-                  Object.values(players.current).filter(
-                    (obj) => obj.peerId == screenShareInfo.current.peerId
-                  )[0].name
-                }
-              />
-            )}
             <Canvas id="canvas" camera={{ position: [0, 0.5, 0.3] }}>
               <Plane />
               <Screen
