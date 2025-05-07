@@ -1,18 +1,15 @@
 /* eslint-disable react/no-unknown-property */
-import { useEffect, useRef, useState, useContext, Suspense } from "react";
+import { useRef, useState, useContext, Suspense } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useLoader } from "@react-three/fiber";
 import { Stats } from "@react-three/drei";
-import { Peer } from "peerjs";
-import * as THREE from "three";
 import { sendModel } from "../helpers/socketConnection";
 import { PlayerContext } from "../helpers/contextProvider";
 import { connectToNewUser, getDefaultDevices } from "../helpers/getMedia";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { LoaderBar } from "../helpers/loaders";
 import WithLoader from "./WithLoader";
 import MeetingInterface from "./MeetingInterface/MeetingInterface";
 import MeetingScene from "./MeetingScene/MeetingScene";
+import usePeerConnection from "../helpers/usePeerConnection";
 
 function MainEngine() {
   const [loading, setLoading] = useState(true);
@@ -45,11 +42,10 @@ function MainEngine() {
   const screenStreamRef = useRef(null);
   const screenShareInfo = useRef(null);
   const povRef = useRef(null);
-  const randomPositionX = useRef();
-  const randomPositionZ = useRef();
+  const randomPositionX = useRef(Math.random());
+  const randomPositionZ = useRef(Math.random() * 2 + 2);
 
   const navigate = useNavigate();
-  const { meetingId } = useParams();
 
   const getMap = () => {
     if (!playersRef.current) {
@@ -58,41 +54,13 @@ function MainEngine() {
     return playersRef.current;
   };
 
-  const { nodes, materials } = useLoader(GLTFLoader, "/television.glb");
+  const triggerMessagePopup = (message, duration) => {
+    setNotification({ show: true, message: message });
 
-  const placeHolder = useLoader(THREE.TextureLoader, "/placeholder.jpg");
-
-  useEffect(() => {
-    // If the socket is not initialized, redirect to the home page
-    if (!socket.current) {
-      navigate(`/${meetingId}`);
-      return;
-    }
-    sessionStorage.clear();
-
-    // Initialize the peer connection
-    try {
-      const peerConnection = new Peer({
-        host: import.meta.env.VITE_PEER_HOST,
-        secure: true,
-      });
-      peerConnection.on("open", () => {
-        peer.current = peerConnection;
-        randomPositionX.current = Math.random();
-        randomPositionZ.current = Math.random() * 2 + 2;
-        getMedia();
-        setLoading(false);
-        triggerMessagePopup("Use W, A, S, D to move around", 10000);
-        getDefaultDevices().then((devices) => {
-          setDevice({audio: devices.audioDevice, video: devices.videoDevice});
-        });
-      });
-    } catch (error) {
-      console.error("Error initializing Peer:", error);
-      alert("Server Error, please try again later");
-      navigate("/");
-    }
-  }, []);
+    setTimeout(() => {
+      setNotification({ show: false, message: "" });
+    }, duration);
+  };
 
   // When the peer connection is established, setup call
   const getMedia = () => {
@@ -308,19 +276,13 @@ function MainEngine() {
   const onDisconnect = () => {
     socket.current.on("user-disconnected", (player) => {
       const id = player.socketId;
-      setNotification({
-        show: true,
-        message: `${players.current[id].name} left the meeting`,
-      });
+
+      // Notification
+      triggerMessagePopup(`${players.current[id].name} left the meeting`, 3000)
 
       setPlayerKeys((prev) => {
         return prev.filter((key) => key.socketId !== id);
       });
-
-      // Notification
-      setTimeout(() => {
-        setNotification({ show: false, message: "" });
-      }, 3000);
 
       delete players.current[id]
       if (playersRef.current) {
@@ -362,13 +324,7 @@ function MainEngine() {
     });
   };
 
-  const triggerMessagePopup = (message, duration) => {
-    setNotification({ show: true, message: message });
-
-    setTimeout(() => {
-      setNotification({ show: false, message: "" });
-    }, duration);
-  };
+  usePeerConnection(getMedia, setLoading, triggerMessagePopup)
 
   return (
     <Suspense fallback={<LoaderBar />}>
@@ -391,8 +347,6 @@ function MainEngine() {
               screenShareInfo={screenShareInfo}
             />
             <MeetingScene
-              nodes={nodes}
-              materials={materials}
               screen={screen}
               screenStreamRef={screenStreamRef}
               socket={socket}
@@ -404,7 +358,6 @@ function MainEngine() {
               audioIcon={audioIcon}
               videos={videos}
               audios={audios}
-              placeHolder={placeHolder}
               players={players}
               playerKeys={playerKeys}
             />
