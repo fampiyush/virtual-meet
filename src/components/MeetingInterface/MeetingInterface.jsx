@@ -19,6 +19,14 @@ const MeetingInterface = ({
   screenShared,
   screenShareInfo,
 }) => {
+  const shouldShowScreenFull = players && screen && !screenShared;
+
+  const getScreenSharerName = () => {
+    return Object.values(players.current).filter(
+      (obj) => obj.peerId == screenShareInfo.current.peerId
+    )[0].name;
+  };
+
   return (
     <>
       <BottomBar
@@ -33,15 +41,11 @@ const MeetingInterface = ({
       <OwnVideo videoStreamRef={videoStreamRef} isOwnVideo={isOwnVideo} />
       <RightBar />
       <Notification message={message} show={show} />
-      {players && screen && !screenShared && (
+      {shouldShowScreenFull && (
         <ScreenFull
           screen={screen}
           screenStreamRef={screenStreamRef}
-          name={
-            Object.values(players.current).filter(
-              (obj) => obj.peerId == screenShareInfo.current.peerId
-            )[0].name
-          }
+          name={getScreenSharerName()}
         />
       )}
     </>
