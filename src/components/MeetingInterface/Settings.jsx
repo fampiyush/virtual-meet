@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { PlayerContext } from '../helpers/contextProvider';
+import { PlayerContext } from '../../helpers/contextProvider';
 import { IoMdArrowDropright, IoMdArrowDropdown } from "react-icons/io";
 import { FaCheck } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";

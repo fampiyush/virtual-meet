@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, useRef } from "react";
-import { PlayerContext } from "../helpers/contextProvider";
+import { PlayerContext } from "../../helpers/contextProvider";
 import { IoClose, IoSend } from "react-icons/io5";
 
 const ChatBox = ({ setBoxes, boxes, setChatDot }) => {

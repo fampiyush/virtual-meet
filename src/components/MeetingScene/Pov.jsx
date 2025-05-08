@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useMemo, useContext, useEffect } from "react";
-import useKeyboard from "../helpers/useKeyboard";
+import * as THREE from "three";
+import throttle from "lodash.throttle";
 import { useFrame } from "@react-three/fiber";
 import { PerspectiveCamera, PointerLockControls } from "@react-three/drei";
-import { PlayerContext } from "../helpers/contextProvider";
-import throttle from "lodash.throttle";
-import * as THREE from "three";
+import useKeyboard from "../../helpers/useKeyboard";
+import { PlayerContext } from "../../helpers/contextProvider";
 
 const Pov = ({ socket, povRef, randomPositionX, randomPositionZ }) => {
   const { peerConn, pointerLockControls } = useContext(PlayerContext);

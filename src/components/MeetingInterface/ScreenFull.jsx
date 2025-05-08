@@ -1,7 +1,7 @@
 // For showing the screen share in full screen
 
 import { useState, useEffect, useContext } from "react";
-import { PlayerContext } from "../helpers/contextProvider";
+import { PlayerContext } from "../../helpers/contextProvider";
 
 const ScreenFull = ({ screen, screenStreamRef, name }) => {
   const [fullScreen, setFullScreen] = useState(false);
