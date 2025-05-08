@@ -1,10 +1,8 @@
 /* eslint-disable react/no-unknown-property */
 import { useRef, useState, useContext, Suspense } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { Stats } from "@react-three/drei";
 import { sendModel } from "../helpers/socketConnection";
 import { PlayerContext } from "../helpers/contextProvider";
-import { connectToNewUser, getDefaultDevices } from "../helpers/getMedia";
 import { LoaderBar } from "../helpers/loaders";
 import WithLoader from "./WithLoader";
 import MeetingInterface from "./MeetingInterface/MeetingInterface";
@@ -17,9 +15,7 @@ function MainEngine() {
   const [loading, setLoading] = useState(true);
   const {
     playerKeys,
-    setPlayerKeys,
     myName,
-    setPeerConn,
     socket,
     peer,
     room,
@@ -45,8 +41,6 @@ function MainEngine() {
   const povRef = useRef(null);
   const randomPositionX = useRef(Math.random());
   const randomPositionZ = useRef(Math.random() * 2 + 2);
-
-  const navigate = useNavigate();
 
   const getMap = () => {
     if (!playersRef.current) {
@@ -78,12 +72,11 @@ function MainEngine() {
     handlePeerConnection()
   };
 
+   // Initializes the peer connection and triggers getMedia when ready
+  usePeerConnection(getMedia, setLoading, triggerMessagePopup);
+
   // Handles incoming media streams, peer connections, and data channel messages
   const { handleIncomingCall, handlePeerConnection, dataChannel } = usePeerDataHandlers(
-    socket,
-    peer,
-    room,
-    myName,
     players,
     playersRef,
     videos,
@@ -99,24 +92,14 @@ function MainEngine() {
     setVideos,
     setAudios,
     setAudioIcon,
-    setPeerConn,
-    setPlayerKeys,
     triggerMessagePopup,
-    connectToNewUser
   );
 
   // Sets up socket.io event listeners for initial user sync, disconnects, and admin termination
   const { setupSocket } = useSetupSocketEvents(
-    socket,
-    peer,
-    room,
-    myName,
     randomPositionX,
     randomPositionZ,
-    setPeerConn,
-    setPlayerKeys,
     setLoading,
-    navigate,
     triggerMessagePopup,
     dataChannel,
     players,
@@ -124,9 +107,6 @@ function MainEngine() {
     videos,
     videoRef
   );
-
-  // Initializes the peer connection and triggers getMedia when ready
-  usePeerConnection(getMedia, setLoading, triggerMessagePopup);
 
   return (
     <Suspense fallback={<LoaderBar />}>

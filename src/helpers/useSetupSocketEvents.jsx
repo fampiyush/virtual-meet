@@ -1,14 +1,11 @@
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { PlayerContext } from "./contextProvider";
+
 const useSetupSocketEvents = (
-  socket,
-  peer,
-  room,
-  myName,
   randomPositionX,
   randomPositionZ,
-  setPeerConn,
-  setPlayerKeys,
   setLoading,
-  navigate,
   triggerMessagePopup,
   dataChannel,
   players,
@@ -16,6 +13,10 @@ const useSetupSocketEvents = (
   videos,
   videoRef,
 ) => {
+  const navigate = useNavigate();
+  const { socket, peer, room, myName, setPeerConn, setPlayerKeys } =
+    useContext(PlayerContext);
+
   const setupSocket = () => {
     // Request the list of all currently connected users
     socket.current.emit("get-all-users");

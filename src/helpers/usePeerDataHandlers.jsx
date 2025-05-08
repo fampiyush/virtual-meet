@@ -1,8 +1,8 @@
+import { useContext } from "react";
+import { PlayerContext } from "./contextProvider";
+import { connectToNewUser } from "./getMedia";
+
 const usePeerDataHandlers = (
-  socket,
-  peer,
-  room,
-  myName,
   players,
   playersRef,
   videos,
@@ -18,11 +18,11 @@ const usePeerDataHandlers = (
   setVideos,
   setAudios,
   setAudioIcon,
-  setPeerConn,
-  setPlayerKeys,
   triggerMessagePopup,
-  connectToNewUser
 ) => {
+  const { socket, peer, room, myName, setPeerConn, setPlayerKeys } =
+    useContext(PlayerContext);
+
   const handleIncomingCall = () => {
     peer.current.on("call", (call) => {
       call.answer();
