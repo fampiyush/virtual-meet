@@ -7,13 +7,13 @@ import {
   BsCameraVideoOffFill,
 } from "react-icons/bs";
 import { LuScreenShare } from "react-icons/lu";
-import { PlayerContext } from "../helpers/contextProvider";
+import { PlayerContext } from "../../helpers/contextProvider";
 import {
   getMediaStreamAudio,
   getMediaStreamVideo,
   getMediaStreamScreen,
-} from "../helpers/getMedia";
-import { LoaderSync } from '../helpers/loaders';
+} from "../../helpers/getMedia";
+import { LoaderSync } from '../../helpers/loaders';
 
 const BottomBar = ({
   audioStreamRef,

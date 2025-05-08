@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { PlayerContext } from "../helpers/contextProvider";
+import { PlayerContext } from "../../helpers/contextProvider";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { MdOutlineContentCopy, MdLock } from "react-icons/md";
 import { IoClose } from "react-icons/io5";

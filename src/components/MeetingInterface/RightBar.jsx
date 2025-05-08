@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ImPhoneHangUp } from "react-icons/im";
-import { PlayerContext } from "../helpers/contextProvider";
+import { PlayerContext } from "../../helpers/contextProvider";
 import { IoClose, IoChatboxEllipses, IoSettings } from "react-icons/io5";
-import { LoaderSync } from "../helpers/loaders";
+import { LoaderSync } from "../../helpers/loaders";
 import ChatBox from "./ChatBox";
 import Settings from './Settings';
 
