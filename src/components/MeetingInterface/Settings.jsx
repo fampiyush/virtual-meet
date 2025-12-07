@@ -77,7 +77,7 @@ const Settings = ({ setBoxes, boxes }) => {
       <button className='absolute right-0 rounded-full hover:bg-gray-400' onClick={() => setBoxes({ ...boxes, settings: false })}>
         <IoClose size={23} />
       </button>
-      <div className="mt-1 flex-col text-center flex-1 overflow-y-scroll no-scrollbar">
+      <div className="mt-1 p-1 flex-col text-center flex-1 overflow-y-scroll no-scrollbar">
         <button
           onClick={() => setDeviceDropDown(!deviceDropDown)}
           className="flex items-center justify-between p-2 rounded-lg w-full bg-[#535a6d] hover:bg-[#6f778f]"
@@ -85,7 +85,7 @@ const Settings = ({ setBoxes, boxes }) => {
           Change Audio/Video Device &nbsp;
           {deviceDropDown ? <IoMdArrowDropdown /> : <IoMdArrowDropright />}
         </button>
-        <div className={`${deviceDropDown ? "" : "hidden"}`}>
+        <div className={`pl-2 ${deviceDropDown ? "" : "hidden"}`}>
           <button
             onClick={() =>
               setDeviceSections((prev) => ({
