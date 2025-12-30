@@ -63,6 +63,18 @@ VITE_BASE_URL=http://localhost:5173
 ```
 For creating your own peer server, head over to [peerjs-server](https://github.com/peers/peerjs-server)
 
+> [!IMPORTANT]
+> Depending on your peer host, you might need to change the configuration in `usePeerConnection.jsx`:
+>
+> ```js
+> const peerConnection = new Peer({
+>   host: import.meta.env.VITE_PEER_HOST,
+>   path: '/peer', // remove this if using default server
+>   port: 3000,    // remove this if using default server
+>   secure: true,
+> });
+> ```
+
 ## Contributing
 
 Contributions are welcome! If you have any ideas or improvements, please submit a pull request.
