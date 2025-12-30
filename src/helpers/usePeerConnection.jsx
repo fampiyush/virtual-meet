@@ -21,6 +21,8 @@ const usePeerConnection = (getMedia, setLoading, triggerMessagePopup) => {
     try {
       const peerConnection = new Peer({
         host: import.meta.env.VITE_PEER_HOST,
+        path: '/peer',
+        port: 3000,
         secure: true,
       });
       peerConnection.on("open", () => {
